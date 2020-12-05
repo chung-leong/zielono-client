@@ -1,0 +1,70 @@
+{
+  "name": "zielono-client",
+  "description": "Client library for Zielono websites",
+  "author": "Chung Leong",
+  "version": "0.0.1",
+  "main": "./index",
+  "preferGlobal": false,
+  "sideEffects": false,
+  "repository": "git://github.com/chung-leong/zielono-client.git",
+  "homepage": "https://github.com/chung-leong/zielono-client",
+  "bugs": {
+    "url": "http://github.com/chung-leong/zielono-client/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "zielono",
+    "react"
+  ],
+  "tags": [
+    "zielono",
+    "react"
+  ],
+  "files": [
+    "src/",
+    "index.js",
+    "index.mjs"
+  ],
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -- test/*.mjs",
+    "test:watch": "./node_modules/mocha/bin/mocha --parallel --watch -- test/*.mjs",
+    "test:browser": "./node_modules/karma/bin/karma start --single-run --",
+    "test:browser:watch": "./node_modules/karma/bin/karma start --",
+    "rollup": "npm run rollup:umd && npm run rollup:esm",
+    "rollup:umd": "rollup -c rollup.config.js",
+    "rollup:esm": "rollup -c rollup.config.esm.js"
+  },
+  "peerDependencies": {
+    "react": "^17.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-react": "^7.12.7",
+    "@babel/runtime": "^7.12.5",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "babel-loader": "^8.2.2",
+    "chai": "^4.2.0",
+    "cross-fetch": "^3.0.6",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.5",
+    "exceljs": "^4.2.0",
+    "karma": "^5.2.3",
+    "karma-babel-preprocessor": "^8.0.1",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-mocha": "^2.0.1",
+    "karma-server-side": "^1.8.0",
+    "karma-sourcemap-loader": "^0.3.8",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "^4.0.2",
+    "mocha": "^8.2.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "rollup": "^2.34.1",
+    "rollup-plugin-babel": "^4.3.3",
+    "webpack": "^5.9.0",
+    "webpack-cli": "^4.2.0"
+  }
+}
