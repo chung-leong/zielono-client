@@ -4,6 +4,7 @@ import {
   Cell,
   Column,
   Sheet,
+  Workbook,
   setDOMHandler
 } from '../src/excel.mjs';
 
@@ -191,6 +192,86 @@ describe('Excel objects', function() {
         const view = sheet.filter([ 'PL' ]);
         expect(view.columns).to.be.an('array').with.lengthOf(1);
         expect(view.columns.name.flags).to.eql([ 'pl-PL' ]);
+      })
+    })
+  })
+  describe('Workbook', function() {
+    const json = {
+      keywords: 'key word',
+      title: 'This is a title',
+      description: 'This is a description',
+      subject: 'Test',
+      category: 'Good',
+      status: 'ready',
+      sheets: [
+        {
+          name: 'Name',
+          nameCC: 'name',
+          flags: [ 'first' ],
+          columns: [
+            {
+              name: 'Name',
+              nameCC: 'name',
+              flags: [ 'en-US' ],
+              header: { value: 'Name' },
+              cells: [
+                { value: 'Agnes' }
+              ]
+            },
+            {
+              name: 'Name',
+              nameCC: 'name',
+              flags: [ 'pl-PL' ],
+              header: { value: 'Name' },
+              cells: [
+                { value: 'Agnieszka' }
+              ]
+            }
+          ],
+        },
+        {
+          name: 'Name',
+          nameCC: 'name',
+          flags: [ 'last' ],
+          columns: [
+            {
+              name: 'Name',
+              nameCC: 'name',
+              header: { value: 'Name' },
+              cells: [
+                { value: 'Osiecka' }
+              ]
+            },
+          ],
+        }
+      ]
+    };
+    it('should process JSON data correctly', function() {
+      const workbook = new Workbook(json);
+      expect(workbook.keywords).to.equal('key word');
+      expect(workbook.title).to.equal('This is a title');
+      expect(workbook.description).to.equal('This is a description');
+      expect(workbook.subject).to.equal('Test');
+      expect(workbook.category).to.equal('Good');
+      expect(workbook.status).to.equal('ready');
+      expect(workbook.sheets).to.be.an('array').with.lengthOf(2);
+      expect(workbook.sheets.name).to.be.an.instanceOf(Sheet);
+    })
+    describe('filter', function() {
+      it('should filter out sheets and columns', function() {
+        const workbook = new Workbook(json);
+        const view1 = workbook.filter([ 'first', 'pl-PL' ]);
+        expect(view1.keywords).to.equal(workbook.keywords);
+        expect(view1.title).to.equal(workbook.title);
+        expect(view1.description).to.equal(workbook.description);
+        expect(view1.subject).to.equal(workbook.subject);
+        expect(view1.category).to.equal(workbook.category);
+        expect(view1.status).to.equal(workbook.status);
+        expect(view1.sheets).to.be.an('array').with.lengthOf(1);
+        expect(view1.sheets.name.flags).to.eql([ 'first' ]);
+        expect(view1.sheets.name.columns.name.flags).to.eql([ 'pl-PL' ]);
+        const view2 = workbook.filter([ 'last', 'pl-PL' ]);
+        expect(view2.sheets.name.flags).to.eql([ 'last' ]);
       })
     })
   })

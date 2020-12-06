@@ -44,7 +44,7 @@ class Workbook {
 
 class WorkbookView {
   #workbook;
-  #sheets;
+  #sheets = [];
 
   get title() { return this.#workbook.title }
   get keywords() { return this.#workbook.keywords }
