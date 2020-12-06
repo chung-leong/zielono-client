@@ -454,13 +454,17 @@ function parseLocale(locale) {
 }
 
 function stringifyValue(value) {
-  if (typeof(value) === 'number') {
+  if (typeof(value) === 'string') {
+    return value;
+  } else if (typeof(value) === 'number') {
     return value.toLocaleString();
   } else if (value instanceof Date) {
     const options = { dateStyle: 'short', timeStyle: 'short' };
     return value.toLocaleDateString(undefined, options);
   } else if (value instanceof Array) {
     return value.map((t) => t.text).join('');
+  } else if (value && value.error) {
+    return '#ERR';
   } else {
     return '';
   }
