@@ -5,13 +5,15 @@ import {
   Column,
   Sheet,
   Workbook,
-  setDOMHandler
 } from '../src/excel.mjs';
+import {
+  setDOMHandler
+} from '../src/dom.mjs';
 
 class TestElement {}
 class TestContainer {}
 
-function createElement(tag, props, children) {
+function createTestElement(tag, props, children) {
   return { tag, props, children };
 }
 
@@ -20,7 +22,7 @@ describe('Excel objects', function() {
     setDOMHandler({
       element: TestElement,
       container: TestContainer,
-      create: createElement,
+      create: createTestElement,
     });
     process.env.TZ = 'Europe/Warsaw';
   })
@@ -58,7 +60,7 @@ describe('Excel objects', function() {
         {
           text: '!'
         }
-      ]
+      ];
       const cell = new Cell(sheet, { value: richText }, 0, 0);
       expect(cell.value).to.equal(richText);
       expect(cell.text).to.equal('This is a test!');
@@ -81,7 +83,6 @@ describe('Excel objects', function() {
             props: { style: {} },
             children: '!'
           }
-
         ]
       })
     })

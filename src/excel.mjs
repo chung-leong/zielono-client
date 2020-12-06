@@ -1,3 +1,6 @@
+import { Image } from './image.mjs';
+import { createElement, createRichText, getChildProps } from './dom.mjs';
+
 class Workbook {
   #title;
   #keywords;
@@ -6,6 +9,7 @@ class Workbook {
   #category;
   #status;
   #sheets = [];
+  #location;
 
   get title() { return this.#title }
   get keywords() { return this.#keywords }
@@ -14,8 +18,9 @@ class Workbook {
   get category() { return this.#category }
   get status() { return this.#status }
   get sheets() { return this.#sheets }
+  get location() { return this.#location }
 
-  constructor(json) {
+  constructor(json, location) {
     const {
       keywords = '',
       title = '',
@@ -31,6 +36,7 @@ class Workbook {
     this.#subject = subject;
     this.#category = category;
     this.#status = status;
+    this.#location = location;
     for (let [ index, sheet ] of sheets.entries()) {
       this.#sheets.push(new Sheet(this, sheet, index));
     }
@@ -325,7 +331,7 @@ class Cell {
     this.#colIndex = colIndex;
     this.#rowIndex = rowIndex;
     if (image) {
-      this.#image = new Image(sheet.workbook, image);
+      this.#image = new Image(image, sheet.workbook.location);
     }
   }
 
@@ -346,56 +352,11 @@ class Cell {
     }
   }
 
-
   render(props) {
     const { tagName = 'div', style: otherStyle, ...others } = props || {};
     const style = { ...this.style, ...otherStyle };
     return createElement(tagName, { style, ...others }, this.richText);
   }
-}
-
-class Image {
-  #workbook;
-  #hash;
-  #width;
-  #height;
-
-  constructor(workbook, json) {
-    const {
-      hash = '',
-      width,
-      height ,
-    } = json;
-    this.#workbook = workbook;
-    this.#width = width;
-    this.#height = height;
-  }
-}
-
-let Element;
-let Container;
-let createElementHandler;
-
-function setDOMHandler(config) {
-  Element = config.element;
-  Container = config.container;
-  createElementHandler = config.create;
-}
-
-function createRichText(tokens) {
-  const children = [];
-  for (let token of tokens) {
-    const { text, style = {} } = token;
-    children.push(createElement('span', { style }, text));
-  }
-  return createElement(Container, {}, children);
-}
-
-function createElement(tagName, props, children) {
-  if (!createElementHandler) {
-    throw new Error('No DOM handler');
-  }
-  return createElementHandler(tagName, props, children);
 }
 
 function attachProperties(objects) {
@@ -488,16 +449,6 @@ function stringifyValue(value) {
   }
 }
 
-function getChildProps(tagName, props) {
-  if (tagName === 'ul' || tagName === 'ol') {
-    return { tagName: 'li' };
-  } else if (tagName === 'tr') {
-    return { tagName: 'td' };
-  } else {
-    return {};
-  }
-}
-
 export {
   Workbook,
   WorkbookView,
@@ -506,6 +457,4 @@ export {
   Row,
   Column,
   Cell,
-  Image,
-  setDOMHandler,
 };
