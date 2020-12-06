@@ -23,7 +23,7 @@ class Workbook {
       subject = '',
       category = '',
       status = '',
-      sheets,
+      sheets = [],
     } = json;
     this.#title = title;
     this.#keywords = keywords;
@@ -84,11 +84,11 @@ class Sheet {
 
   constructor(workbook, json, index) {
     const {
-      name,
-      nameCC,
+      name = '',
+      nameCC = '',
       flags = [],
-      rows,
-      columns
+      rows = [],
+      columns = [],
     } = json;
     this.#workbook = workbook;
     this.#name = name;
@@ -133,12 +133,15 @@ class Sheet {
   }
 
   renderTableHead() {
-    const headers = this.columns.map((c) => c.header).filter((h) => h);
-    if (headers.length > 0) {
-      const childProps = { tagName: 'th' };
-      const children = headers.map((c) => c.render(childProps));
-      const row = createElement('tr', {}, children);
-      return createElement('thead', {}, [ row ]);
+    const rowCount = this.columns[0].headers.length;
+    if (rowCount > 0) {
+      const rows = [];
+      for (let i = 0; i < rowCount; i++) {
+        const childProps = { tagName: 'th' };
+        const children = this.columns.map((c) => c.headers[i].render(childProps));
+        rows.push(createElement('tr', {}, children));
+      }
+      return createElement('thead', {}, rows);
     }
   }
 
@@ -181,37 +184,37 @@ class Column {
   #name;
   #nameCC;
   #flags;
-  #header;
   #index;
+  #headers = [];
   #cells = [];
 
   get sheet() { return this.#sheet }
   get name() { return this.#name }
   get nameCC() { return this.#nameCC }
   get flags() { return this.#flags }
-  get header() { return this.#header }
+  get headers() { return this.#headers }
   get index() { return this.#index }
   get number() { return this.#index + 1 }
   get cells() { return this.#cells }
 
   constructor(sheet, json, index) {
     const {
-      name,
-      nameCC,
+      name = '',
+      nameCC = '',
       flags = [],
-      header,
-      cells,
+      headers = [],
+      cells = [],
     } = json;
     this.#sheet = sheet;
     this.#name = name;
     this.#nameCC = nameCC;
     this.#flags = flags;
     this.#index = index;
-    if (header) {
-      this.#header = new Cell(sheet, header, index, -1);
+    for (let [ headerIndex, header ] of headers.entries()) {
+      this.#headers.push(new Cell(sheet, header, index, headerIndex - headers.length));
     }
     for (let [ rowIndex, cell ] of cells.entries()) {
-      this.#cells.push(new Cell(sheet, cell, index, rowIndex))
+      this.#cells.push(new Cell(sheet, cell, index, rowIndex));
     }
   }
 
@@ -310,7 +313,7 @@ class Cell {
 
   constructor(sheet, json, colIndex, rowIndex) {
     const {
-      value,
+      value = null,
       text,
       style = {},
       image,
@@ -359,9 +362,9 @@ class Image {
 
   constructor(workbook, json) {
     const {
-      hash,
+      hash = '',
       width,
-      height,
+      height ,
     } = json;
     this.#workbook = workbook;
     this.#width = width;

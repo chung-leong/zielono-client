@@ -115,7 +115,7 @@ describe('Excel objects', function() {
     const json = {
       name: 'Name',
       nameCC: 'name',
-      header: { value: 'Name' },
+      headers: [ { value: 'Name' } ],
       cells: [
         { value: 'Agnieszka' },
       ]
@@ -126,7 +126,8 @@ describe('Excel objects', function() {
       expect(column.name).to.equal('Name');
       expect(column.nameCC).to.equal('name');
       expect(column.flags).to.eql([]);
-      expect(column.header).to.be.instanceOf(Cell);
+      expect(column.headers).to.have.lengthOf(1);
+      expect(column.headers[0]).to.be.an.instanceOf(Cell);
       expect(column.cells).to.be.an('array').with.lengthOf(1);
       expect(column.cells[0]).to.be.instanceOf(Cell);
       expect(column.number).to.equal(2);
@@ -142,7 +143,7 @@ describe('Excel objects', function() {
           name: 'Name',
           nameCC: 'name',
           flags: [ 'en-US' ],
-          header: { value: 'Name' },
+          headers: [ { value: 'Name' } ],
           cells: [
             { value: 'Agnes' }
           ]
@@ -151,7 +152,7 @@ describe('Excel objects', function() {
           name: 'Name',
           nameCC: 'name',
           flags: [ 'pl-PL' ],
-          header: { value: 'Name' },
+          headers: [ { value: 'Name' } ],
           cells: [
             { value: 'Agnieszka' }
           ]
@@ -213,7 +214,7 @@ describe('Excel objects', function() {
               name: 'Name',
               nameCC: 'name',
               flags: [ 'en-US' ],
-              header: { value: 'Name' },
+              headers: [ { value: 'Name' } ],
               cells: [
                 { value: 'Agnes' }
               ]
@@ -222,7 +223,7 @@ describe('Excel objects', function() {
               name: 'Name',
               nameCC: 'name',
               flags: [ 'pl-PL' ],
-              header: { value: 'Name' },
+              headers: [ { value: 'Name' } ],
               cells: [
                 { value: 'Agnieszka' }
               ]
@@ -237,7 +238,7 @@ describe('Excel objects', function() {
             {
               name: 'Name',
               nameCC: 'name',
-              header: { value: 'Name' },
+              headers: [ { value: 'Name' } ],
               cells: [
                 { value: 'Osiecka' }
               ]
