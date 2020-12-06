@@ -31,8 +31,8 @@ class Workbook {
     this.#subject = subject;
     this.#category = category;
     this.#status = status;
-    for (let sheet of sheets) {
-      this.#sheets.push(new Sheet(this, sheet));
+    for (let [ index, sheet ] of sheets.entries()) {
+      this.#sheets.push(new Sheet(this, sheet, index));
     }
     attachProperties(this.#sheets);
   }
@@ -69,16 +69,20 @@ class Sheet {
   #name;
   #nameCC;
   #flags;
+  #index;
   #rows = [];
   #columns = [];
 
+  get workbook() { return this.#workbook }
   get name() { return this.#name }
   get nameCC() { return this.#nameCC }
   get flags() { return this.#flags }
+  get index() { return this.#index }
+  get number() { return this.#index + 1 }
   get rows() { return this.#rows }
   get columns() { return this.#columns }
 
-  constructor(workbook, json) {
+  constructor(workbook, json, index) {
     const {
       name,
       nameCC,
@@ -90,13 +94,14 @@ class Sheet {
     this.#name = name;
     this.#nameCC = nameCC;
     this.#flags = flags;
+    this.#index = index;
     for (let [ index, column ] of columns.entries()) {
       this.#columns.push(new Column(this, column, index));
     }
-    const firstCol = sheet.#columns[0];
+    const firstCol = this.#columns[0];
     const rowCount = (firstCol) ? firstCol.cells.length : 0;
     for (let i = 0; i < rowCount; i++) {
-      this.#rows.push(Row.create(this, i));
+      this.#rows.push(new Row(this, i));
     }
     attachProperties(this.#columns);
   }
@@ -146,16 +151,19 @@ class Sheet {
 
 class SheetView {
   #sheet;
-  #columns;
-  #rows;
+  #columns = [];
+  #rows = [];
 
+  get workbook() { return this.#sheet.workbook }
   get name() { return this.#sheet.name }
   get nameCC() { return this.#sheet.nameCC }
   get flags() { return this.#sheet.flags }
+  get index() { return this.#sheet.index }
+  get number() { return this.#sheet.number }
   get rows() { return this.#rows }
   get columns() { return this.#columns }
 
-  constructor(sheet, options) {
+  constructor(sheet, flags) {
     this.#sheet = sheet;
     const { columns, rows } = sheet;
     for (let column of filterObjects(columns, flags)) {
@@ -240,7 +248,7 @@ class Row {
     this.#index = index;
     const { columns } = sheet;
     for (let column of columns) {
-      this.#cells.push(columns.cells[this.#index]);
+      this.#cells.push(column.cells[this.#index]);
     }
     attachProperties(this.#cells);
   }
@@ -304,12 +312,13 @@ class Cell {
     const {
       value,
       text,
-      style,
+      style = {},
       image,
     } = json;
     this.#sheet = sheet;
     this.#value = value;
     this.#text = text || stringifyValue(value);
+    this.#style = style;
     this.#colIndex = colIndex;
     this.#rowIndex = rowIndex;
     if (image) {
@@ -406,7 +415,7 @@ function filterObjects(objects, flags) {
         slot.score = score;
       }
     } else {
-      slots[nameCC] = { object, score };
+      slots[object.nameCC] = { object, score };
     }
   }
   const remaining = [];
@@ -424,15 +433,21 @@ function calculateMatch(objFlags, flags) {
   for (let flag of flags) {
     let flagScore = 0;
     for (let objFlag of objFlags) {
+      let score = 0;
       if (objFlag === flag) {
-        flagScore = 1;
-        break;
+        score = 1;
       } else if (flagScore === 0) {
         const [ objLang, objCountry ] = parseLocale(objFlag);
         const [ lang, country ] = parseLocale(flag);
-        if (objLang === lang || objCountry === country) {
-          flagScore = 0.5;
+        if (lang && objLang === lang) {
+          // score is lower on conflict
+          score = (country && objCountry) ? 0.25 : 0.5;
+        } else if (country && objCountry === country) {
+          score = (lang && objLang) ? 0.25 : 0.5;
         }
+      }
+      if (score > flagScore) {
+        flagScore = score;
       }
     }
     overallScore += flagScore;
@@ -441,7 +456,7 @@ function calculateMatch(objFlags, flags) {
 }
 
 function parseLocale(locale) {
-  let m;
+  let m, language, country;
   if (m = /^([a-z]{2})-([A-Z]{2})$/.exec(locale)) {
     language = m[1];
     country = m[2];
