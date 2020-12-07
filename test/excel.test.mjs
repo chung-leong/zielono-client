@@ -27,10 +27,15 @@ describe('Excel objects', function() {
     process.env.TZ = 'Europe/Warsaw';
   })
   describe('Cell', function() {
-    const sheet = {};
+    const sheet = {
+      columns: [ { name: 'Greeting', nameCC: 'greeting' } ]
+    };
     it('should handle plain text value correctly', function() {
       const cell = new Cell(sheet, { value: 'Hello' }, 0, 0);
       expect(cell.sheet).to.equal(sheet);
+      expect(cell.column).to.equal(sheet.columns[0]);
+      expect(cell.name).to.equal('Greeting');
+      expect(cell.nameCC).to.equal('greeting');
       expect(cell.value).to.equal('Hello');
       expect(cell.text).to.equal('Hello');
       expect(cell.richText).to.eql({
@@ -39,7 +44,7 @@ describe('Excel objects', function() {
         children: [
           {
             tag: 'span',
-            props: { style: {} },
+            props: { key: 0, style: {} },
             children: 'Hello'
           }
         ]
@@ -70,17 +75,17 @@ describe('Excel objects', function() {
         children: [
           {
             tag: 'span',
-            props: { style: {} },
+            props: { key: 0, style: {} },
             children: 'This is a '
           },
           {
             tag: 'span',
-            props: { style: { fontWeight: 'bold' } },
+            props: { key: 1, style: { fontWeight: 'bold' } },
             children: 'test'
           },
           {
             tag: 'span',
-            props: { style: {} },
+            props: { key: 2, style: {} },
             children: '!'
           }
         ]

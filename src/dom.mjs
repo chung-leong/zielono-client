@@ -1,20 +1,24 @@
-let Element;
-let Container;
+let elementClass;
+let containerClass;
 let createElementHandler;
 
 function setDOMHandler(config) {
-  Element = config.element;
-  Container = config.container;
+  elementClass = config.element;
+  containerClass = config.container;
   createElementHandler = config.create;
+}
+
+function getDOMClass() {
+  return elementClass;
 }
 
 function createRichText(tokens) {
   const children = [];
-  for (let token of tokens) {
+  for (let [ index, token ] of tokens.entries()) {
     const { text, style = {} } = token;
-    children.push(createElement('span', { style }, text));
+    children.push(createElement('span', { key: index, style }, text));
   }
-  return createElement(Container, {}, children);
+  return createElement(containerClass, {}, children);
 }
 
 function createElement(tagName, props, children) {
@@ -36,6 +40,7 @@ function getChildProps(tagName, props) {
 
 export {
   setDOMHandler,
+  getDOMClass,
   createElement,
   createRichText,
   getChildProps,

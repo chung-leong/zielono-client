@@ -1,5 +1,5 @@
 import { Image } from './image.mjs';
-import { createElement, createRichText, getChildProps } from './dom.mjs';
+import { createElement, createRichText, getChildProps, getDOMClass } from './dom.mjs';
 
 class Workbook {
   #title;
@@ -133,7 +133,10 @@ class Sheet {
       children = (thead) ? [ thead, tbody ] : [ tbody ];
     } else {
       const childProps = getChildProps(tagName, others)
-      children = this.rows.map((c) => c.render(childProps));
+      children = [];
+      for (let [ index, row ] of this.rows.entries()) {
+        children.push(row.render({ key: index, ...childProps }));
+      }
     }
     return createElement(tagName, others, children);
   }
@@ -143,17 +146,22 @@ class Sheet {
     if (rowCount > 0) {
       const rows = [];
       for (let i = 0; i < rowCount; i++) {
-        const childProps = { tagName: 'th' };
-        const children = this.columns.map((c) => c.headers[i].render(childProps));
-        rows.push(createElement('tr', {}, children));
+        const children = [];
+        for (let [ index, column ] of this.columns.entries()) {
+          const header = column.headers[i];
+          children.push(header.render({ key: index, tagName: 'th' }));
+        }
+        rows.push(createElement('tr', { key: i }, children));
       }
       return createElement('thead', {}, rows);
     }
   }
 
   renderTableBody() {
-    const childProps = { tagName: 'tr' };
-    const children = this.rows.map((c) => c.render(childProps));
+    const children = [];
+    for (let [ index, row ] of this.rows.entries()) {
+      children.push(row.render({ key: index, tagName: 'tr' }));
+    }
     return createElement('tbody', {}, children);
   }
 }
@@ -182,6 +190,11 @@ class SheetView {
       this.#rows.push(new Row(this, i));
     }
     attachProperties(this.#columns);
+  }
+
+  render(props) {
+    const f = Sheet.prototype.render;
+    return f.call(this, props);
   }
 }
 
@@ -217,7 +230,8 @@ class Column {
     this.#flags = flags;
     this.#index = index;
     for (let [ headerIndex, header ] of headers.entries()) {
-      this.#headers.push(new Cell(sheet, header, index, headerIndex - headers.length));
+      const rowIndex = headerIndex - headers.length;
+      this.#headers.push(new Cell(sheet, header, index, rowIndex));
     }
     for (let [ rowIndex, cell ] of cells.entries()) {
       this.#cells.push(new Cell(sheet, cell, index, rowIndex));
@@ -236,11 +250,13 @@ class Column {
   render(props) {
     const { tagName = 'ul', ...others } = props || {};
     const childProps = getChildProps(tagName, others);
-    const children = this.cells.map((c) => c.render(childProps));
+    const children = [];
+    for (let [ index, cell ] of this.cells.entries()) {
+      children.push(cell.render({ key: index, ...childProps }));
+    }
     return createElement(tagName, others, children);
   }
 }
-
 
 class Row {
   #sheet;
@@ -276,9 +292,11 @@ class Row {
   }
 
   render(props) {
-    const { tagName = 'div', ...others } = props || {};
+    const { tagName = 'ul', ...others } = props || {};
     const childProps = getChildProps(tagName, others);
-    const children = this.cells.map((c) => c.render(childProps));
+    const children = this.cells.entries.map(([ index, cell ]) => {
+      return cell.render({ key: index, ...childProps });
+    });
     return createElement(tagName, others, children);
   }
 }
@@ -344,7 +362,7 @@ class Cell {
       return (this.value instanceof Date) ? this.value : new Date(NaN);
     } else if (type === Image) {
       return this.image;
-    } else if (type === Element) {
+    } else if (type === getDOMClass()) {
       return this.richText;
     } else {
       const msg = `Unable to map type "${type.name}" to a property`;

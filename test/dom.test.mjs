@@ -53,17 +53,17 @@ describe('DOM utilities', function() {
         children: [
           {
             tag: 'span',
-            props: { style: {} },
+            props: { key: 0, style: {} },
             children: 'This is a '
           },
           {
             tag: 'span',
-            props: { style: { fontWeight: 'bold' } },
+            props: { key: 1, style: { fontWeight: 'bold' } },
             children: 'test'
           },
           {
             tag: 'span',
-            props: { style: {} },
+            props: { key: 2, style: {} },
             children: '!'
           }
         ]
