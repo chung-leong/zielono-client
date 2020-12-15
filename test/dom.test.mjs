@@ -51,21 +51,13 @@ describe('DOM utilities', function() {
         tag: TestContainer,
         props: {},
         children: [
-          {
-            tag: 'span',
-            props: { key: 0, style: {} },
-            children: 'This is a '
-          },
+          'This is a ',
           {
             tag: 'span',
             props: { key: 1, style: { fontWeight: 'bold' } },
             children: 'test'
           },
-          {
-            tag: 'span',
-            props: { key: 2, style: {} },
-            children: '!'
-          }
+          '!',
         ]
       })
     })

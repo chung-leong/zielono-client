@@ -112,6 +112,15 @@ class Sheet {
     attachProperties(this.#columns);
   }
 
+  cell(colIndex, rowIndex) {
+    const column = this.columns[colIndex];
+    if (rowIndex < 0) {
+      return column.headers[column.headers.length + rowIndex];
+    } else {
+      return column.cells[rowIndex];
+    }
+  }
+
   get(types) {
     const objects = [];
     for (let row of this.rows) {
@@ -310,23 +319,22 @@ class Cell {
   #image;
   #rowIndex;
   #colIndex;
+  #master;
+  #masterIndices;
 
   get sheet() { return this.#sheet }
-  get value() { return this.#value }
-  get text() { return this.#text }
+  get value() { this.#copy(); return this.#value }
+  get text() { this.#copy(); return this.#text }
   get richText() {
+    this.#copy();
     if (!this.#richText) {
-      const { value, text } = this;
-      if (value instanceof Array) {
-        return createRichText(value);
-      } else {
-        return createRichText([ { text } ]);
-      }
+      const tokens = (this.#value instanceof Array) ? this.#value : this.#text;
+      this.#richText = createRichText(tokens, this.#style);
     }
     return this.#richText;
   }
-  get image() { return this.#image }
-  get style() { return this.#style }
+  get image() { this.#copy(); return this.#image }
+  get style() { this.#copy(); return this.#style }
   get rowIndex() { return this.#rowIndex }
   get rowNumber() { return this.#rowIndex + 1 }
   get column() { return this.#sheet.columns[this.#colIndex] }
@@ -334,22 +342,43 @@ class Cell {
   get columnNumber() { return this.#colIndex + 1 }
   get name() { return this.column.name }
   get nameCC() { return this.column.nameCC }
+  get master() { this.#copy(); return this.#master }
 
   constructor(sheet, json, colIndex, rowIndex) {
-    const {
-      value = null,
-      text,
-      style = {},
-      image,
-    } = json;
     this.#sheet = sheet;
-    this.#value = value;
-    this.#text = text || stringifyValue(value);
-    this.#style = style;
     this.#colIndex = colIndex;
     this.#rowIndex = rowIndex;
-    if (image) {
-      this.#image = new Image(image, sheet.workbook.location);
+    if (json.master) {
+      this.#masterIndices = json.master;
+    } else {
+      const {
+        value = null,
+        text,
+        style = {},
+        image,
+        master,
+      } = json;
+      this.#value = value;
+      this.#text = text || stringifyValue(value);
+      this.#style = style;
+      if (image) {
+        this.#image = new Image(image, sheet.workbook.location);
+      }
+    }
+  }
+
+  #copy() {
+    if (this.#masterIndices && !this.#master) {
+      const { col, row } = this.#masterIndices;
+      const cell = this.#sheet.cell(col, row);
+      if (cell) {
+        this.#value = cell.value;
+        this.#text = cell.text;
+        this.#style = cell.style;
+        this.#richText = cell.richText;
+        this.#image = cell.image;
+        this.#master = cell;
+      }
     }
   }
 
@@ -371,9 +400,28 @@ class Cell {
   }
 
   render(props) {
-    const { tagName = 'div', style: otherStyle, ...others } = props || {};
+    const {
+      tagName = 'div',
+      style: otherStyle,
+      image: imageProps,
+      ...others
+    } = props || {};
     const style = { ...this.style, ...otherStyle };
-    return createElement(tagName, { style, ...others }, this.richText);
+    const tokens = (this.value instanceof Array) ? this.value : this.text;
+    const richText = createRichText(tokens, null);
+    let children;
+    if (this.image) {
+      if (this.text) {
+        const img = this.image.render({ key: 0, ...imageProps });
+        const legend = createElement('figcaption', { key: 1 }, richText);
+        children = createElement('figure', {}, [ img, legend ]);
+      } else {
+        children = this.image.render(imageProps);
+      }
+    } else {
+      children = richText;
+    }
+    return createElement(tagName, { style, ...others }, children);
   }
 }
 

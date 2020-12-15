@@ -41,13 +41,7 @@ describe('Excel objects', function() {
       expect(cell.richText).to.eql({
         tag: TestContainer,
         props: {},
-        children: [
-          {
-            tag: 'span',
-            props: { key: 0, style: {} },
-            children: 'Hello'
-          }
-        ]
+        children: [ 'Hello' ],
       })
       expect(cell.style).to.eql({});
       expect(cell.columnNumber).to.equal(1);
@@ -64,7 +58,7 @@ describe('Excel objects', function() {
         },
         {
           text: '!'
-        }
+        },
       ];
       const cell = new Cell(sheet, { value: richText }, 0, 0);
       expect(cell.value).to.equal(richText);
@@ -73,21 +67,13 @@ describe('Excel objects', function() {
         tag: TestContainer,
         props: {},
         children: [
-          {
-            tag: 'span',
-            props: { key: 0, style: {} },
-            children: 'This is a '
-          },
+          'This is a ',
           {
             tag: 'span',
             props: { key: 1, style: { fontWeight: 'bold' } },
             children: 'test'
           },
-          {
-            tag: 'span',
-            props: { key: 2, style: {} },
-            children: '!'
-          }
+          '!',
         ]
       })
     })
@@ -115,6 +101,41 @@ describe('Excel objects', function() {
       expect(cell.value).to.eql(new Date(0));
       expect(cell.text).to.equal('Jan 1 1970');
     })
+    it('should retrieve values from master cell when merged', function() {
+      const sheet = {
+        cell(col, row) { return master }
+      };
+      const master = new Cell(sheet, { value: new Date(0), text: 'Jan 1 1970' }, 0, 0);
+      const cell = new Cell(sheet, { master: { col: 3, row: 5 } }, 0, 0);
+      expect(cell.master).to.equal(master);
+      expect(cell.value).to.eql(new Date(0));
+      expect(cell.text).to.equal('Jan 1 1970');
+    })
+    it('should transfer cell-level text style to plain text value', function() {
+      const cell = new Cell(sheet, {
+        value: 'Hello',
+        style: {
+          color: '#ff0000'
+        },
+      }, 0, 0);
+      expect(cell.richText).to.eql({
+        tag: TestContainer,
+        props: {},
+        children: [
+          {
+            tag: 'span',
+            props: {
+              key: 0,
+              style: {
+                color: '#ff0000'
+              },
+            },
+            children: 'Hello'
+          }
+        ],
+      })
+    })
+
   })
   describe('Column', function() {
     const sheet = {};
