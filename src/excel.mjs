@@ -74,6 +74,7 @@ class Sheet {
   #workbook;
   #name;
   #nameCC;
+  #nameKC;
   #flags;
   #index;
   #rows = [];
@@ -82,6 +83,12 @@ class Sheet {
   get workbook() { return this.#workbook }
   get name() { return this.#name }
   get nameCC() { return this.#nameCC }
+  get nameKC() {
+    if (!this.#nameKC) {
+      this.#nameKC = kebabCase(this.#nameCC);
+    }
+    return this.#nameKC;
+  }
   get flags() { return this.#flags }
   get index() { return this.#index }
   get number() { return this.#index + 1 }
@@ -183,6 +190,7 @@ class SheetView {
   get workbook() { return this.#sheet.workbook }
   get name() { return this.#sheet.name }
   get nameCC() { return this.#sheet.nameCC }
+  get nameKC() { return this.#sheet.nameKC }
   get flags() { return this.#sheet.flags }
   get index() { return this.#sheet.index }
   get number() { return this.#sheet.number }
@@ -211,6 +219,7 @@ class Column {
   #sheet;
   #name;
   #nameCC;
+  #nameKC;
   #flags;
   #index;
   #headers = [];
@@ -219,6 +228,12 @@ class Column {
   get sheet() { return this.#sheet }
   get name() { return this.#name }
   get nameCC() { return this.#nameCC }
+  get nameKC() {
+    if (!this.#nameKC) {
+      this.#nameKC = kebabCase(this.#nameCC);
+    }
+    return this.#nameKC;
+  }
   get flags() { return this.#flags }
   get headers() { return this.#headers }
   get index() { return this.#index }
@@ -342,6 +357,7 @@ class Cell {
   get columnNumber() { return this.#colIndex + 1 }
   get name() { return this.column.name }
   get nameCC() { return this.column.nameCC }
+  get nameKC() { return this.column.nameKC }
   get master() { this.#copy(); return this.#master }
 
   constructor(sheet, json, colIndex, rowIndex) {
@@ -513,6 +529,10 @@ function stringifyValue(value) {
   } else {
     return '';
   }
+}
+
+function kebabCase(nameCC) {
+  return nameCC.replace(/[A-Z]/g, (m0) => '-' + m0.toLowerCase());
 }
 
 export {

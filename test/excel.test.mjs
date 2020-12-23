@@ -140,9 +140,9 @@ describe('Excel objects', function() {
   describe('Column', function() {
     const sheet = {};
     const json = {
-      name: 'Name',
-      nameCC: 'name',
-      headers: [ { value: 'Name' } ],
+      name: 'First name',
+      nameCC: 'firstName',
+      headers: [ { value: 'First name' } ],
       cells: [
         { value: 'Agnieszka' },
       ]
@@ -150,8 +150,9 @@ describe('Excel objects', function() {
     it('should process JSON data correctly', function() {
       const column = new Column(sheet, json, 1);
       expect(column.sheet).to.equal(sheet)
-      expect(column.name).to.equal('Name');
-      expect(column.nameCC).to.equal('name');
+      expect(column.name).to.equal('First name');
+      expect(column.nameCC).to.equal('firstName');
+      expect(column.nameKC).to.equal('first-name');
       expect(column.flags).to.eql([]);
       expect(column.headers).to.have.lengthOf(1);
       expect(column.headers[0]).to.be.an.instanceOf(Cell);
