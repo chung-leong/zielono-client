@@ -1,87 +1,112 @@
-const { existsSync, readFileSync } = require('fs');
-const { resolve, dirname, basename } = require('path');
-const URL = require('url');
-const fetch = require('cross-fetch');
+const { readFile, writeFile } = require('fs').promises;
+const { resolve, dirname, basename, extname } = require('path');
 const { platform } = require('os');
-const { question } = require('readline-sync');
+const readline = require('readline');
+const fetch = require('cross-fetch');
+const requireNodeModule = require;
 
 const server = {
   before(app, server) {
     const fs = server.middleware.fileSystem;
     const contentBase = server.options.contentBase;
-    const baseURL = getBaseURL();
-    app.get('/:path(*.*)', (req, res, next) => {
-      const { path } = req.params;
-      server.middleware.waitUntilValid(() => {
-        try {
-          const ext = extname(path);
-          const filename = basename(path);
-          const filePath = contentBase + '/www/' + filename;
-          const buffer = fs.readFileSync(filePath);
-          res.type(ext).send(buffer);
-        } catch (err) {
-          if (filename === 'favicon.ico') {
-            res.sendStatus(204);
-            return;
-          }
-          next(err);
+    const waitUntilValid = () => new Promise((cb) => server.middleware.waitUntilValid(cb));
+    const baseURLRetrieval = (async () => {
+      await waitUntilValid();
+      await getBaseURL();
+    })();
+    // attach static file handler
+    app.get('/:path(*.*)', async (req, res, next) => {
+      try {
+        await waitUntilValid();
+        const { path } = req.params;
+        const ext = extname(path);
+        const filename = basename(path);
+        const filePath = `${contentBase}/www/${filename}`;
+        const buffer = fs.readFileSync(filePath);
+        res.type(ext).send(buffer);
+      } catch (err) {
+        if (filename === 'favicon.ico') {
+          res.sendStatus(204);
+          return;
         }
-      });
+        next(err);
+      }
     });
-    app.get('/:path(*)', (req, res, next) => {
-      const path = req.url;
-      const lang = getPreferredLanguage(req);
-      server.middleware.waitUntilValid(async () => {
-        try {
-          const codePath = `${contentBase}/ssr/index.js`;
-          const html = await generatePage(fs, codePath, path, lang, baseURL);
-          res.type('html').send(html);
-        } catch (err) {
-          next(err);
-        }
-      });
+    // attach static page handler
+    app.get('/:path(*)', async (req, res, next) => {
+      try {
+        await waitUntilValid();
+        const path = req.url;
+        const codePath = `${contentBase}/ssr/index.js`;
+        const lang = getPreferredLanguage(req);
+        const baseURL = await baseURLRetrieval;
+        const html = await generatePage(fs, codePath, path, lang, baseURL);
+        res.type('html').send(html);
+      } catch (err) {
+        next(err);
+      }
     });
   },
   after(app, server) {
+    // attach error handler
     app.use((err, req, res, next) => {
       res.status(err.status || 500);
       if (err.html) {
         res.type('html').send(err.html);
       } else {
-        res.type('text').send(err.message);
+        res.type('text').send(err.stack);
       }
     });
-  }
-}
+  },
+  inline: true,
+};
 
-function getBaseURL() {
+/**
+ * Obtain base URL of website from a link file, prompting the user to enter one if file is missing
+ *
+ * @return {string}
+ */
+async function getBaseURL() {
   const exts = [ '.desktop', '.url' ];
   for (let ext of exts) {
     const filename = `test-server${ext}`;
-    const path = Path.resolve(`./${filename}`);
-    if (existsSync(path)) {
-      const text = readFileSync(path, 'utf-8');
+    const path = resolve(`./${filename}`);
+    try {
+      const text = await readFile(path, 'utf-8');
       const m = /^URL=(.*)$/mi.exec(text);
       if (m) {
         return m[1];
       }
+    } catch (err) {
     }
   }
-  const prompt = 'Server URL: ';
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: true,
+  });
   let url = '';
   do {
-    url = question(prompt).trim();
-    const parsed = URL.parse(url);
-    if (!parsed.hostname || !parsed.protocol) {
-      console.log('[Invalid URL]');
-      url = null;
+    url = await new Promise((resolve) => rl.question('Server URL: ', resolve));
+    url = url.trim();
+    try {
+      url = (new URL(url)).href;
+    } catch (err) {
+      console.error(err.message);
+      url = '';
     }
   } while(!url);
-  saveBaseURL(url);
+  rl.close();
+  await saveBaseURL(url);
   return url;
 }
 
-function saveBaseURL(url) {
+/**
+ * Save base URL into a link file
+ *
+ * @param  {string} url
+ */
+async function saveBaseURL(url) {
   const lines = [];
   let ext = '.url';
   let nl = '\n';
@@ -106,7 +131,7 @@ function saveBaseURL(url) {
   const text = lines.join(nl);
   const filename = `test-server${ext}`;
   const path = resolve(`./${filename}`);
-  writeFileSync(path, text);
+  await writeFile(path, text);
 }
 
 global.fetch = function(url, optionsGiven) {
@@ -114,60 +139,73 @@ global.fetch = function(url, optionsGiven) {
   return fetch(url, options);
 };
 
-function generatePage(fs, codePath, path, lang, baseURL) {
-  const buffer = fs.readFileSync(codePath);
-  const dirname = dirname(codePath);
-  const filename = basename(codePath);
-  const ssr = compileCode(buffer, dirname, filename);
-  const options = {
-    dataSourceBaseURL: baseURL,
-    routeBasePath: '/',
-    routePagePath: path,
-    ssrTarget: 'hydrate',
-    preferredLanguage: lang,
-  };
-  return ssr.render(options).then(function(html) {
-    return '<!DOCTYPE html>\n' + html;
-  });
+/**
+ * Generate an HTML page
+ *
+ * @param  {Ifs} fs
+ * @param  {string} codePath
+ * @param  {string} path
+ * @param  {string} locale
+ * @param  {string} baseURL
+ *
+ * @return {string}
+ */
+async function generatePage(fs, codePath, path, locale, baseURL) {
+  const module = compileCode(fs, codePath);
+  const options = { baseURL, path, locale, ssr: 'hydrate' };
+  const html = await module.render(options);
+  return '<!DOCTYPE html>\n' + html;
 }
 
 /**
  * Compile a CommonJS module
- * @param  {Buffer} buffer
- * @param  {string} dirname
- * @param  {string} filename
+ *
+ * @param  {Ifs} fs
+ * @param  {string} path
  *
  * @return {Object}
  */
-function compileCode(buffer, dirname, filename) {
+function compileCode(fs, path) {
+  const buffer = fs.readFileSync(path);
   const code = buffer.toString();
   const cjsHeader = '(function(require, exports, module, __dirname, __filename) {\n';
   const cjsTrailer = '\n})';
-  const f = (() => eval(arguments[0]))(cjsHeader + code + cjsTrailer);
+  const f = (function() { return eval(arguments[0]) })(cjsHeader + code + cjsTrailer);
+  const require = (modulePath) => {
+    let moduleFullPath = resolve(dirname(path), modulePath);
+    let exists = fs.existsSync(moduleFullPath);
+    if (!exists && extname(moduleFullPath) !== '.js') {
+      moduleFullPath += '.js';
+      exists = fs.existsSync(moduleFullPath);
+    }
+    if (exists) {
+      return compileCode(fs, moduleFullPath);
+    } else {
+      return requireNodeModule(modulePath);
+    }
+  };
   const module = { exports: {} };
-  f(require, module.exports, module, dirname, filename);
+  f(require, module.exports, module, dirname(path), basename(path));
   return module.exports;
 }
 
 /**
  * Return language most preferred by visitor
+ *
  * @param  {Request} req
  *
  * @return {string}
  */
 function getPreferredLanguage(req) {
   const accept = req.headers['accept-language'] || 'en';
-  const tokens = accept.split(/\s*,\s*/);
-  const list = tokens.map(function(token) {
+  const list = accept.split(/\s*,\s*/).map(function(token) {
     const m = /([^;]+);q=(.*)/.exec(token);
-    if (m) {
-      return { language: m[1], qFactor: parseFloat(m[2]) };
-    } else {
-      return { language: token, qFactor: 1 };
-    }
+    const code = (m) ?  m[1] : token;
+    const qFactor = (m) ? parseFloat(m[2]) : 1;
+    return { code, qFactor };
   });
-  list.sort(function(a, b) {
-    return b.qFactor - a.qFactor;
-  });
-  return list[0].language;
+  list.sort((a, b) => b.qFactor - a.qFactor);
+  return list[0].code;
 }
+
+module.exports = server;
