@@ -23,7 +23,8 @@
   "files": [
     "src/",
     "index.js",
-    "index.mjs"
+    "index.mjs",
+    "dev-server-config.js"
   ],
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha -- test/*.mjs",
