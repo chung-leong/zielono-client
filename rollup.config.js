@@ -1,9 +1,7 @@
-const Babel = require('rollup-plugin-babel');
-const Resolve = require('@rollup/plugin-node-resolve');
+import Babel from 'rollup-plugin-babel';
+import Resolve from '@rollup/plugin-node-resolve';
 
-module.exports = [
-  'index',
-].map((name) => {
+export default [ 'index' ].map((name) => {
   return {
     input: `src/${name}.mjs`,
     output: {
@@ -20,6 +18,10 @@ module.exports = [
         presets: [
           '@babel/env',
         ],
+        plugins: [
+          [ '@babel/plugin-proposal-class-properties', { loose: true } ],
+          [ '@babel/plugin-proposal-private-methods', { loose: true } ],
+        ]
       }),
       Resolve(),
     ],

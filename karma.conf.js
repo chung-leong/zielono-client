@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = (config) => {
   config.set({
     port: 9876,
     logLevel: config.LOG_WARNING,
@@ -64,11 +64,7 @@ module.exports = function(config) {
 };
 
 function parseTestPattern(argv) {
-  var index = argv.indexOf('--');
-  var patterns = (index !== -1) ? argv.slice(index + 1) : [];
-  if (patterns.length > 0) {
-    return [ '--grep' ].concat(patterns);
-  } else {
-    return [];
-  }
+  const index = argv.indexOf('--');
+  const patterns = (index !== -1) ? argv.slice(index + 1) : [];
+  return (patterns.length > 0) ? [ '--grep', ...patterns ] : [];
 }
