@@ -2519,32 +2519,6 @@
     });
   }
 
-  var _baseURL = _classPrivateFieldLooseKey("baseURL");
-
-  var _intervals = _classPrivateFieldLooseKey("intervals");
-
-  var _queries = _classPrivateFieldLooseKey("queries");
-
-  var _updateTime = _classPrivateFieldLooseKey("updateTime");
-
-  var _updateTimeout = _classPrivateFieldLooseKey("updateTimeout");
-
-  var _fetch = _classPrivateFieldLooseKey("fetch");
-
-  var _getQuery = _classPrivateFieldLooseKey("getQuery");
-
-  var _runQuery = _classPrivateFieldLooseKey("runQuery");
-
-  var _scheduleUpdate = _classPrivateFieldLooseKey("scheduleUpdate");
-
-  var _rescheduleUpdate = _classPrivateFieldLooseKey("rescheduleUpdate");
-
-  var _scheduleNextUpdate = _classPrivateFieldLooseKey("scheduleNextUpdate");
-
-  var _update = _classPrivateFieldLooseKey("update");
-
-  var _getURL = _classPrivateFieldLooseKey("getURL");
-
   var DataSource = /*#__PURE__*/function (_EventEmitter) {
     _inherits(DataSource, _EventEmitter);
 
@@ -2555,6 +2529,7 @@
 
       _classCallCheck(this, DataSource);
 
+      _this = _super.call(this);
       var _options$baseURL = options.baseURL,
           baseURL = _options$baseURL === void 0 ? '/' : _options$baseURL,
           _options$refresh = options.refresh,
@@ -2563,13 +2538,17 @@
           retry = _options$retry === void 0 ? 10 : _options$retry,
           _options$stale = options.stale,
           stale = _options$stale === void 0 ? 1 : _options$stale;
-      _classPrivateFieldLooseBase(_assertThisInitialized(_this), _baseURL)[_baseURL] = baseURL;
-      _classPrivateFieldLooseBase(_assertThisInitialized(_this), _intervals)[_intervals] = {
+      _this.baseURL = baseURL + (baseURL.endsWith('/') ? '' : '/');
+      _this.intervals = {
         refresh: refresh,
         retry: retry,
         stale: stale
       };
-      return _possibleConstructorReturn(_this);
+      _this.queries = [];
+      _this.updateTime = null;
+      _this.updateTimeout = 0;
+      _this.stopped = false;
+      return _this;
     }
 
     _createClass(DataSource, [{
@@ -2580,7 +2559,7 @@
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  return _context.abrupt("return", _classPrivateFieldLooseBase(this, _fetch)[_fetch](Workbook, name));
+                  return _context.abrupt("return", this.fetch(Workbook, name));
 
                 case 1:
                 case "end":
@@ -2604,7 +2583,7 @@
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  return _context2.abrupt("return", _classPrivateFieldLooseBase(this, _fetch)[_fetch](Object, name));
+                  return _context2.abrupt("return", this.fetch(Object, name));
 
                 case 1:
                 case "end":
@@ -2620,6 +2599,376 @@
 
         return fetchJSON;
       }()
+    }, {
+      key: "start",
+      value: function start() {
+        this.stopped = false;
+        this.scheduleNextUpdate();
+      }
+    }, {
+      key: "stop",
+      value: function stop() {
+        this.stopped = true;
+
+        if (this.updateTimeout) {
+          clearTimeout(this.updateTimeout);
+          this.updateTime = null;
+          this.updateTimeout = 0;
+        }
+      }
+    }, {
+      key: "fetch",
+      value: function () {
+        var _fetch = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(type, name) {
+          var query;
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  query = this.getQuery(type, name);
+                  _context3.next = 3;
+                  return query.retrieval;
+
+                case 3:
+                  return _context3.abrupt("return", query.result);
+
+                case 4:
+                case "end":
+                  return _context3.stop();
+              }
+            }
+          }, _callee3, this);
+        }));
+
+        function fetch(_x3, _x4) {
+          return _fetch.apply(this, arguments);
+        }
+
+        return fetch;
+      }()
+    }, {
+      key: "getQuery",
+      value: function getQuery(type, name) {
+        var query = this.queries.find(function (q) {
+          return q.type === type && q.name === name;
+        });
+
+        if (query) {
+          if (query.error) {
+            var now = new Date();
+
+            if (query.refreshTime && now > query.refreshTime) {
+              query.retrieval = this.runQuery(query);
+            }
+          }
+        } else {
+          query = {
+            type: type,
+            name: name,
+            etag: '',
+            result: null,
+            retrieval: null,
+            refreshTime: null,
+            error: null
+          };
+          this.queries.push(query);
+          query.retrieval = this.runQuery(query);
+        }
+
+        return query;
+      }
+    }, {
+      key: "runQuery",
+      value: function () {
+        var _runQuery = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(query) {
+          var type, name, url, res, text, etag, status, changed, json, location, refreshType;
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
+                case 0:
+                  _context4.prev = 0;
+                  query.error = null;
+                  type = query.type, name = query.name;
+                  url = this.getURL(name);
+                  _context4.next = 6;
+                  return fetch(url);
+
+                case 6:
+                  res = _context4.sent;
+
+                  if (res.ok) {
+                    _context4.next = 12;
+                    break;
+                  }
+
+                  _context4.next = 10;
+                  return res.text();
+
+                case 10:
+                  text = _context4.sent;
+                  throw new DataSourceError(res.status, res.statusText, text);
+
+                case 12:
+                  etag = res.headers.get('etag');
+                  status = res.headers.get('x-cache-status');
+                  changed = false;
+
+                  if (!(!etag || etag !== query.etag)) {
+                    _context4.next = 23;
+                    break;
+                  }
+
+                  _context4.next = 18;
+                  return res.json();
+
+                case 18:
+                  json = _context4.sent;
+                  location = {
+                    name: name,
+                    url: url,
+                    baseURL: this.baseURL
+                  };
+                  query.result = type === Object ? json : new type(json, location);
+                  query.etag = etag;
+                  changed = true;
+
+                case 23:
+                  refreshType = status === 'STALE' || status === 'UPDATING' ? 'stale' : 'refresh';
+                  query.refreshTime = this.scheduleUpdate(refreshType);
+                  query.retrieval = null;
+                  return _context4.abrupt("return", changed);
+
+                case 29:
+                  _context4.prev = 29;
+                  _context4.t0 = _context4["catch"](0);
+                  query.error = _context4.t0;
+
+                  if (!(400 <= _context4.t0.status && _context4.t0.status <= 499)) {
+                    query.refreshTime = this.scheduleUpdate('retry');
+                  }
+
+                  throw _context4.t0;
+
+                case 34:
+                case "end":
+                  return _context4.stop();
+              }
+            }
+          }, _callee4, this, [[0, 29]]);
+        }));
+
+        function runQuery(_x5) {
+          return _runQuery.apply(this, arguments);
+        }
+
+        return runQuery;
+      }()
+    }, {
+      key: "scheduleUpdate",
+      value: function scheduleUpdate(type) {
+        var interval = this.intervals[type];
+
+        if (interval === false) {
+          return;
+        }
+
+        var now = new Date();
+        var later = new Date(now.getTime() + interval * 1000);
+
+        if (!this.updateTime || this.updateTime > later) {
+          this.rescheduleUpdate(later);
+        }
+
+        return later;
+      }
+    }, {
+      key: "rescheduleUpdate",
+      value: function rescheduleUpdate(later) {
+        var _this2 = this;
+
+        var now = new Date();
+
+        if (this.updateTimeout) {
+          clearTimeout(this.updateTimeout);
+        }
+
+        this.updateTime = later;
+        this.updateTimeout = setTimeout(function () {
+          _this2.updateTime = null;
+          _this2.updateTimeout = 0;
+
+          _this2.update();
+        }, later - now);
+      }
+    }, {
+      key: "scheduleNextUpdate",
+      value: function scheduleNextUpdate() {
+        var earliest;
+
+        var _iterator = _createForOfIteratorHelper(this.queries),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var query = _step.value;
+
+            if (!earliest || earliest > query.refreshTime) {
+              earliest = query.refreshTime;
+            }
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+
+        if (earliest) {
+          if (!this.updateTime || this.updateTime > earliest) {
+            this.rescheduleUpdate(earliest);
+          }
+        }
+      }
+    }, {
+      key: "scheduleUpdateOnEvent",
+      value: function scheduleUpdateOnEvent(target, event) {
+        var _this3 = this;
+
+        var listener = function listener(evt) {
+          target.removeEventListener(event, listener);
+
+          _this3.update();
+        };
+
+        target.addEventListener(event, listener);
+      }
+    }, {
+      key: "update",
+      value: function () {
+        var _update = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+          var now, changed, _iterator2, _step2, query;
+
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  if (!this.stopped) {
+                    _context5.next = 2;
+                    break;
+                  }
+
+                  return _context5.abrupt("return");
+
+                case 2:
+                  if (!(typeof Window === 'function')) {
+                    _context5.next = 11;
+                    break;
+                  }
+
+                  if (!(document.hidden === false)) {
+                    _context5.next = 8;
+                    break;
+                  }
+
+                  this.scheduleUpdateOnEvent(document, 'visibilitychange');
+                  return _context5.abrupt("return");
+
+                case 8:
+                  if (!(navigator.onLine === false)) {
+                    _context5.next = 11;
+                    break;
+                  }
+
+                  this.scheduleUpdateOnEvent(window, 'online');
+                  return _context5.abrupt("return");
+
+                case 11:
+                  now = new Date();
+                  changed = false;
+                  _iterator2 = _createForOfIteratorHelper(this.queries);
+                  _context5.prev = 14;
+
+                  _iterator2.s();
+
+                case 16:
+                  if ((_step2 = _iterator2.n()).done) {
+                    _context5.next = 30;
+                    break;
+                  }
+
+                  query = _step2.value;
+
+                  if (!(Math.abs(now - query.refreshTime) < 1000)) {
+                    _context5.next = 28;
+                    break;
+                  }
+
+                  _context5.prev = 19;
+                  _context5.next = 22;
+                  return this.runQuery(query);
+
+                case 22:
+                  if (!_context5.sent) {
+                    _context5.next = 24;
+                    break;
+                  }
+
+                  changed = true;
+
+                case 24:
+                  _context5.next = 28;
+                  break;
+
+                case 26:
+                  _context5.prev = 26;
+                  _context5.t0 = _context5["catch"](19);
+
+                case 28:
+                  _context5.next = 16;
+                  break;
+
+                case 30:
+                  _context5.next = 35;
+                  break;
+
+                case 32:
+                  _context5.prev = 32;
+                  _context5.t1 = _context5["catch"](14);
+
+                  _iterator2.e(_context5.t1);
+
+                case 35:
+                  _context5.prev = 35;
+
+                  _iterator2.f();
+
+                  return _context5.finish(35);
+
+                case 38:
+                  this.scheduleNextUpdate();
+
+                  if (changed) {
+                    this.triggerEvent(new DataSourceEvent('change'));
+                  }
+
+                case 40:
+                case "end":
+                  return _context5.stop();
+              }
+            }
+          }, _callee5, this, [[14, 32, 35, 38], [19, 26]]);
+        }));
+
+        function update() {
+          return _update.apply(this, arguments);
+        }
+
+        return update;
+      }()
+    }, {
+      key: "getURL",
+      value: function getURL(name) {
+        return "".concat(this.baseURL, "-/data/").concat(name);
+      }
     }]);
 
     return DataSource;
@@ -2644,10 +2993,16 @@
 
     var _super3 = _createSuper(DataSourceError);
 
-    function DataSourceError() {
+    function DataSourceError(status, statusText, text) {
+      var _this4;
+
       _classCallCheck(this, DataSourceError);
 
-      return _super3.apply(this, arguments);
+      _this4 = _super3.call(this, "".concat(status, " ").concat(statusText));
+      _this4.status = status;
+      _this4.statusText = statusText;
+      _this4.text = text;
+      return _this4;
     }
 
     return DataSourceError;

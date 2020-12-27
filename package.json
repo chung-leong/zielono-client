@@ -27,10 +27,10 @@
     "dev-server-config.js"
   ],
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -- test/*.mjs",
-    "test:watch": "./node_modules/mocha/bin/mocha --parallel --watch -- test/*.mjs",
-    "test:browser": "./node_modules/karma/bin/karma start --single-run --",
-    "test:browser:watch": "./node_modules/karma/bin/karma start --",
+    "test": "mocha -- test/*.mjs",
+    "test:watch": "mocha --parallel --watch -- test/*.mjs",
+    "test:browser": "karma start --single-run --",
+    "test:browser:watch": "karma start --",
     "rollup": "npm run rollup:umd && npm run rollup:esm",
     "rollup:umd": "rollup -c rollup.config.js",
     "rollup:esm": "rollup -c rollup.config.esm.js"
