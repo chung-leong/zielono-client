@@ -285,6 +285,7 @@ describe('Excel objects', function() {
       expect(workbook.status).to.equal('ready');
       expect(workbook.sheets).to.be.an('array').with.lengthOf(2);
       expect(workbook.sheets.name).to.be.an.instanceOf(Sheet);
+      expect(workbook.locales).to.eql([ 'en-US', 'pl-PL' ]);
     })
     describe('filter', function() {
       it('should filter out sheets and columns', function() {

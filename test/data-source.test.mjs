@@ -41,7 +41,7 @@ describe('Data source', function() {
   })
   afterEach(function() {
     if (ds) {
-      ds.stop();
+      ds.deactivate();
     }
   })
   let root, fetchBefore;

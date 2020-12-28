@@ -1138,6 +1138,8 @@ var _sheets = _classPrivateFieldLooseKey("sheets");
 
 var _location$1 = _classPrivateFieldLooseKey("location");
 
+var _locales = _classPrivateFieldLooseKey("locales");
+
 var Workbook = /*#__PURE__*/function () {
   _createClass(Workbook, [{
     key: "title",
@@ -1179,6 +1181,45 @@ var Workbook = /*#__PURE__*/function () {
     get: function get() {
       return _classPrivateFieldLooseBase(this, _location$1)[_location$1];
     }
+  }, {
+    key: "locales",
+    get: function get() {
+      if (!_classPrivateFieldLooseBase(this, _locales)[_locales]) {
+        _classPrivateFieldLooseBase(this, _locales)[_locales] = [];
+
+        var _iterator = _createForOfIteratorHelper(_classPrivateFieldLooseBase(this, _sheets)[_sheets]),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var sheet = _step.value;
+
+            var _iterator2 = _createForOfIteratorHelper(sheet.locales),
+                _step2;
+
+            try {
+              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+                var locale = _step2.value;
+
+                if (!_classPrivateFieldLooseBase(this, _locales)[_locales].includes(locale)) {
+                  _classPrivateFieldLooseBase(this, _locales)[_locales].push(locale);
+                }
+              }
+            } catch (err) {
+              _iterator2.e(err);
+            } finally {
+              _iterator2.f();
+            }
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+      }
+
+      return _classPrivateFieldLooseBase(this, _locales)[_locales];
+    }
   }]);
 
   function Workbook(json, location) {
@@ -1216,6 +1257,10 @@ var Workbook = /*#__PURE__*/function () {
       writable: true,
       value: void 0
     });
+    Object.defineProperty(this, _locales, {
+      writable: true,
+      value: void 0
+    });
     var _json$keywords = json.keywords,
         keywords = _json$keywords === void 0 ? '' : _json$keywords,
         _json$title = json.title,
@@ -1238,21 +1283,21 @@ var Workbook = /*#__PURE__*/function () {
     _classPrivateFieldLooseBase(this, _status)[_status] = status;
     _classPrivateFieldLooseBase(this, _location$1)[_location$1] = location;
 
-    var _iterator = _createForOfIteratorHelper(sheets.entries()),
-        _step;
+    var _iterator3 = _createForOfIteratorHelper(sheets.entries()),
+        _step3;
 
     try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var _step$value = _slicedToArray(_step.value, 2),
-            index = _step$value[0],
-            sheet = _step$value[1];
+      for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+        var _step3$value = _slicedToArray(_step3.value, 2),
+            index = _step3$value[0],
+            sheet = _step3$value[1];
 
         _classPrivateFieldLooseBase(this, _sheets)[_sheets].push(new Sheet(this, sheet, index));
       }
     } catch (err) {
-      _iterator.e(err);
+      _iterator3.e(err);
     } finally {
-      _iterator.f();
+      _iterator3.f();
     }
 
     attachProperties(_classPrivateFieldLooseBase(this, _sheets)[_sheets]);
@@ -1324,19 +1369,19 @@ var WorkbookView = /*#__PURE__*/function () {
     _classPrivateFieldLooseBase(this, _workbook)[_workbook] = workbook;
     var sheets = workbook.sheets;
 
-    var _iterator2 = _createForOfIteratorHelper(filterObjects(sheets, flags)),
-        _step2;
+    var _iterator4 = _createForOfIteratorHelper(filterObjects(sheets, flags)),
+        _step4;
 
     try {
-      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-        var sheet = _step2.value;
+      for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+        var sheet = _step4.value;
 
         _classPrivateFieldLooseBase(this, _sheets2)[_sheets2].push(sheet.filter(flags));
       }
     } catch (err) {
-      _iterator2.e(err);
+      _iterator4.e(err);
     } finally {
-      _iterator2.f();
+      _iterator4.f();
     }
 
     attachProperties(_classPrivateFieldLooseBase(this, _sheets2)[_sheets2]);
@@ -1360,6 +1405,8 @@ var _index = _classPrivateFieldLooseKey("index");
 var _rows = _classPrivateFieldLooseKey("rows");
 
 var _columns = _classPrivateFieldLooseKey("columns");
+
+var _locales2 = _classPrivateFieldLooseKey("locales");
 
 var Sheet = /*#__PURE__*/function () {
   _createClass(Sheet, [{
@@ -1411,6 +1458,45 @@ var Sheet = /*#__PURE__*/function () {
     get: function get() {
       return _classPrivateFieldLooseBase(this, _columns)[_columns];
     }
+  }, {
+    key: "locales",
+    get: function get() {
+      if (!_classPrivateFieldLooseBase(this, _locales2)[_locales2]) {
+        _classPrivateFieldLooseBase(this, _locales2)[_locales2] = [];
+
+        var _iterator5 = _createForOfIteratorHelper(_classPrivateFieldLooseBase(this, _columns)[_columns]),
+            _step5;
+
+        try {
+          for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+            var column = _step5.value;
+
+            var _iterator6 = _createForOfIteratorHelper(column.locales),
+                _step6;
+
+            try {
+              for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+                var locale = _step6.value;
+
+                if (!_classPrivateFieldLooseBase(this, _locales2)[_locales2].includes(locale)) {
+                  _classPrivateFieldLooseBase(this, _locales2)[_locales2].push(locale);
+                }
+              }
+            } catch (err) {
+              _iterator6.e(err);
+            } finally {
+              _iterator6.f();
+            }
+          }
+        } catch (err) {
+          _iterator5.e(err);
+        } finally {
+          _iterator5.f();
+        }
+      }
+
+      return _classPrivateFieldLooseBase(this, _locales2)[_locales2];
+    }
   }]);
 
   function Sheet(workbook, json, index) {
@@ -1448,6 +1534,10 @@ var Sheet = /*#__PURE__*/function () {
       writable: true,
       value: []
     });
+    Object.defineProperty(this, _locales2, {
+      writable: true,
+      value: void 0
+    });
     var _json$name = json.name,
         name = _json$name === void 0 ? '' : _json$name,
         _json$nameCC = json.nameCC,
@@ -1463,21 +1553,21 @@ var Sheet = /*#__PURE__*/function () {
     _classPrivateFieldLooseBase(this, _flags)[_flags] = flags;
     _classPrivateFieldLooseBase(this, _index)[_index] = index;
 
-    var _iterator3 = _createForOfIteratorHelper(columns.entries()),
-        _step3;
+    var _iterator7 = _createForOfIteratorHelper(columns.entries()),
+        _step7;
 
     try {
-      for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-        var _step3$value = _slicedToArray(_step3.value, 2),
-            _index2 = _step3$value[0],
-            column = _step3$value[1];
+      for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+        var _step7$value = _slicedToArray(_step7.value, 2),
+            _index2 = _step7$value[0],
+            column = _step7$value[1];
 
         _classPrivateFieldLooseBase(this, _columns)[_columns].push(new Column(this, column, _index2));
       }
     } catch (err) {
-      _iterator3.e(err);
+      _iterator7.e(err);
     } finally {
-      _iterator3.f();
+      _iterator7.f();
     }
 
     var firstCol = _classPrivateFieldLooseBase(this, _columns)[_columns][0];
@@ -1507,18 +1597,18 @@ var Sheet = /*#__PURE__*/function () {
     value: function get(types) {
       var objects = [];
 
-      var _iterator4 = _createForOfIteratorHelper(this.rows),
-          _step4;
+      var _iterator8 = _createForOfIteratorHelper(this.rows),
+          _step8;
 
       try {
-        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-          var row = _step4.value;
+        for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
+          var row = _step8.value;
           objects.push(row.get(types));
         }
       } catch (err) {
-        _iterator4.e(err);
+        _iterator8.e(err);
       } finally {
-        _iterator4.f();
+        _iterator8.f();
       }
 
       return objects;
@@ -1545,23 +1635,23 @@ var Sheet = /*#__PURE__*/function () {
         var childProps = getChildProps(tagName);
         children = [];
 
-        var _iterator5 = _createForOfIteratorHelper(this.rows.entries()),
-            _step5;
+        var _iterator9 = _createForOfIteratorHelper(this.rows.entries()),
+            _step9;
 
         try {
-          for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-            var _step5$value = _slicedToArray(_step5.value, 2),
-                index = _step5$value[0],
-                row = _step5$value[1];
+          for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
+            var _step9$value = _slicedToArray(_step9.value, 2),
+                index = _step9$value[0],
+                row = _step9$value[1];
 
             children.push(row.render(_objectSpread2({
               key: index
             }, childProps)));
           }
         } catch (err) {
-          _iterator5.e(err);
+          _iterator9.e(err);
         } finally {
-          _iterator5.f();
+          _iterator9.f();
         }
       }
 
@@ -1578,14 +1668,14 @@ var Sheet = /*#__PURE__*/function () {
         for (var i = 0; i < rowCount; i++) {
           var children = [];
 
-          var _iterator6 = _createForOfIteratorHelper(this.columns.entries()),
-              _step6;
+          var _iterator10 = _createForOfIteratorHelper(this.columns.entries()),
+              _step10;
 
           try {
-            for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
-              var _step6$value = _slicedToArray(_step6.value, 2),
-                  index = _step6$value[0],
-                  column = _step6$value[1];
+            for (_iterator10.s(); !(_step10 = _iterator10.n()).done;) {
+              var _step10$value = _slicedToArray(_step10.value, 2),
+                  index = _step10$value[0],
+                  column = _step10$value[1];
 
               var header = column.headers[i];
               children.push(header.render({
@@ -1594,9 +1684,9 @@ var Sheet = /*#__PURE__*/function () {
               }));
             }
           } catch (err) {
-            _iterator6.e(err);
+            _iterator10.e(err);
           } finally {
-            _iterator6.f();
+            _iterator10.f();
           }
 
           rows.push(createElement('tr', {
@@ -1612,14 +1702,14 @@ var Sheet = /*#__PURE__*/function () {
     value: function renderTableBody() {
       var children = [];
 
-      var _iterator7 = _createForOfIteratorHelper(this.rows.entries()),
-          _step7;
+      var _iterator11 = _createForOfIteratorHelper(this.rows.entries()),
+          _step11;
 
       try {
-        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
-          var _step7$value = _slicedToArray(_step7.value, 2),
-              index = _step7$value[0],
-              row = _step7$value[1];
+        for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
+          var _step11$value = _slicedToArray(_step11.value, 2),
+              index = _step11$value[0],
+              row = _step11$value[1];
 
           children.push(row.render({
             key: index,
@@ -1627,9 +1717,9 @@ var Sheet = /*#__PURE__*/function () {
           }));
         }
       } catch (err) {
-        _iterator7.e(err);
+        _iterator11.e(err);
       } finally {
-        _iterator7.f();
+        _iterator11.f();
       }
 
       return createElement('tbody', {}, children);
@@ -1712,19 +1802,19 @@ var SheetView = /*#__PURE__*/function () {
     var columns = sheet.columns,
         rows = sheet.rows;
 
-    var _iterator8 = _createForOfIteratorHelper(filterObjects(columns, flags)),
-        _step8;
+    var _iterator12 = _createForOfIteratorHelper(filterObjects(columns, flags)),
+        _step12;
 
     try {
-      for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
-        var column = _step8.value;
+      for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
+        var column = _step12.value;
 
         _classPrivateFieldLooseBase(this, _columns2)[_columns2].push(column);
       }
     } catch (err) {
-      _iterator8.e(err);
+      _iterator12.e(err);
     } finally {
-      _iterator8.f();
+      _iterator12.f();
     }
 
     for (var i = 0; i < rows.length; i++) {
@@ -1760,6 +1850,8 @@ var _index3 = _classPrivateFieldLooseKey("index");
 var _headers = _classPrivateFieldLooseKey("headers");
 
 var _cells = _classPrivateFieldLooseKey("cells");
+
+var _locales3 = _classPrivateFieldLooseKey("locales");
 
 var Column = /*#__PURE__*/function () {
   _createClass(Column, [{
@@ -1811,6 +1903,39 @@ var Column = /*#__PURE__*/function () {
     get: function get() {
       return _classPrivateFieldLooseBase(this, _cells)[_cells];
     }
+  }, {
+    key: "locales",
+    get: function get() {
+      if (!_classPrivateFieldLooseBase(this, _locales3)[_locales3]) {
+        _classPrivateFieldLooseBase(this, _locales3)[_locales3] = [];
+
+        var _iterator13 = _createForOfIteratorHelper(_classPrivateFieldLooseBase(this, _flags2)[_flags2]),
+            _step13;
+
+        try {
+          for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
+            var flag = _step13.value;
+
+            var _parseLocale = parseLocale(flag),
+                _parseLocale2 = _slicedToArray(_parseLocale, 2),
+                language = _parseLocale2[0],
+                country = _parseLocale2[1];
+
+            if (language || country) {
+              if (!_classPrivateFieldLooseBase(this, _locales3)[_locales3].includes(flag)) {
+                _classPrivateFieldLooseBase(this, _locales3)[_locales3].push(flag);
+              }
+            }
+          }
+        } catch (err) {
+          _iterator13.e(err);
+        } finally {
+          _iterator13.f();
+        }
+      }
+
+      return _classPrivateFieldLooseBase(this, _locales3)[_locales3];
+    }
   }]);
 
   function Column(sheet, json, index) {
@@ -1848,6 +1973,10 @@ var Column = /*#__PURE__*/function () {
       writable: true,
       value: []
     });
+    Object.defineProperty(this, _locales3, {
+      writable: true,
+      value: void 0
+    });
     var _json$name2 = json.name,
         name = _json$name2 === void 0 ? '' : _json$name2,
         _json$nameCC2 = json.nameCC,
@@ -1864,40 +1993,40 @@ var Column = /*#__PURE__*/function () {
     _classPrivateFieldLooseBase(this, _flags2)[_flags2] = flags;
     _classPrivateFieldLooseBase(this, _index3)[_index3] = index;
 
-    var _iterator9 = _createForOfIteratorHelper(headers.entries()),
-        _step9;
+    var _iterator14 = _createForOfIteratorHelper(headers.entries()),
+        _step14;
 
     try {
-      for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
-        var _step9$value = _slicedToArray(_step9.value, 2),
-            headerIndex = _step9$value[0],
-            header = _step9$value[1];
+      for (_iterator14.s(); !(_step14 = _iterator14.n()).done;) {
+        var _step14$value = _slicedToArray(_step14.value, 2),
+            headerIndex = _step14$value[0],
+            header = _step14$value[1];
 
         var rowIndex = headerIndex - headers.length;
 
         _classPrivateFieldLooseBase(this, _headers)[_headers].push(new Cell(sheet, header, index, rowIndex));
       }
     } catch (err) {
-      _iterator9.e(err);
+      _iterator14.e(err);
     } finally {
-      _iterator9.f();
+      _iterator14.f();
     }
 
-    var _iterator10 = _createForOfIteratorHelper(cells.entries()),
-        _step10;
+    var _iterator15 = _createForOfIteratorHelper(cells.entries()),
+        _step15;
 
     try {
-      for (_iterator10.s(); !(_step10 = _iterator10.n()).done;) {
-        var _step10$value = _slicedToArray(_step10.value, 2),
-            _rowIndex = _step10$value[0],
-            cell = _step10$value[1];
+      for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
+        var _step15$value = _slicedToArray(_step15.value, 2),
+            _rowIndex = _step15$value[0],
+            cell = _step15$value[1];
 
         _classPrivateFieldLooseBase(this, _cells)[_cells].push(new Cell(sheet, cell, index, _rowIndex));
       }
     } catch (err) {
-      _iterator10.e(err);
+      _iterator15.e(err);
     } finally {
-      _iterator10.f();
+      _iterator15.f();
     }
   }
 
@@ -1906,19 +2035,19 @@ var Column = /*#__PURE__*/function () {
     value: function get(type) {
       var values = [];
 
-      var _iterator11 = _createForOfIteratorHelper(this.cells),
-          _step11;
+      var _iterator16 = _createForOfIteratorHelper(this.cells),
+          _step16;
 
       try {
-        for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
-          var cell = _step11.value;
+        for (_iterator16.s(); !(_step16 = _iterator16.n()).done;) {
+          var cell = _step16.value;
           var value = cell.get(type);
           values.push(value);
         }
       } catch (err) {
-        _iterator11.e(err);
+        _iterator16.e(err);
       } finally {
-        _iterator11.f();
+        _iterator16.f();
       }
 
       return values;
@@ -1934,23 +2063,23 @@ var Column = /*#__PURE__*/function () {
       var childProps = getChildProps(tagName);
       var children = [];
 
-      var _iterator12 = _createForOfIteratorHelper(this.cells.entries()),
-          _step12;
+      var _iterator17 = _createForOfIteratorHelper(this.cells.entries()),
+          _step17;
 
       try {
-        for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
-          var _step12$value = _slicedToArray(_step12.value, 2),
-              index = _step12$value[0],
-              cell = _step12$value[1];
+        for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
+          var _step17$value = _slicedToArray(_step17.value, 2),
+              index = _step17$value[0],
+              cell = _step17$value[1];
 
           children.push(cell.render(_objectSpread2({
             key: index
           }, childProps)));
         }
       } catch (err) {
-        _iterator12.e(err);
+        _iterator17.e(err);
       } finally {
-        _iterator12.f();
+        _iterator17.f();
       }
 
       return createElement(tagName, others, children);
@@ -1987,6 +2116,11 @@ var Row = /*#__PURE__*/function () {
     get: function get() {
       return _classPrivateFieldLooseBase(this, _cells2)[_cells2];
     }
+  }, {
+    key: "locales",
+    get: function get() {
+      return _classPrivateFieldLooseBase(this, _sheet3)[_sheet3].locales;
+    }
   }]);
 
   function Row(sheet, index) {
@@ -2008,19 +2142,19 @@ var Row = /*#__PURE__*/function () {
     _classPrivateFieldLooseBase(this, _index4)[_index4] = index;
     var columns = sheet.columns;
 
-    var _iterator13 = _createForOfIteratorHelper(columns),
-        _step13;
+    var _iterator18 = _createForOfIteratorHelper(columns),
+        _step18;
 
     try {
-      for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
-        var column = _step13.value;
+      for (_iterator18.s(); !(_step18 = _iterator18.n()).done;) {
+        var column = _step18.value;
 
         _classPrivateFieldLooseBase(this, _cells2)[_cells2].push(column.cells[_classPrivateFieldLooseBase(this, _index4)[_index4]]);
       }
     } catch (err) {
-      _iterator13.e(err);
+      _iterator18.e(err);
     } finally {
-      _iterator13.f();
+      _iterator18.f();
     }
 
     attachProperties(_classPrivateFieldLooseBase(this, _cells2)[_cells2]);
@@ -2182,6 +2316,11 @@ var Cell = /*#__PURE__*/function () {
       return this.column.nameKC;
     }
   }, {
+    key: "locales",
+    get: function get() {
+      return this.column.locales;
+    }
+  }, {
     key: "master",
     get: function get() {
       _classPrivateFieldLooseBase(this, _copy)[_copy]();
@@ -2339,33 +2478,33 @@ var _copy2 = function _copy2() {
 };
 
 function attachProperties(objects) {
-  var _iterator14 = _createForOfIteratorHelper(objects),
-      _step14;
+  var _iterator19 = _createForOfIteratorHelper(objects),
+      _step19;
 
   try {
-    for (_iterator14.s(); !(_step14 = _iterator14.n()).done;) {
-      var object = _step14.value;
+    for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
+      var object = _step19.value;
 
       if (!objects[object.nameCC]) {
         objects[object.nameCC] = object;
       }
     }
   } catch (err) {
-    _iterator14.e(err);
+    _iterator19.e(err);
   } finally {
-    _iterator14.f();
+    _iterator19.f();
   }
 }
 
 function filterObjects(objects, flags) {
   var slots = {};
 
-  var _iterator15 = _createForOfIteratorHelper(objects),
-      _step15;
+  var _iterator20 = _createForOfIteratorHelper(objects),
+      _step20;
 
   try {
-    for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
-      var object = _step15.value;
+    for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
+      var object = _step20.value;
       // see how closely is the match
       var score = calculateMatch(object.flags, flags);
       var slot = slots[object.nameCC];
@@ -2383,19 +2522,19 @@ function filterObjects(objects, flags) {
       }
     }
   } catch (err) {
-    _iterator15.e(err);
+    _iterator20.e(err);
   } finally {
-    _iterator15.f();
+    _iterator20.f();
   }
 
   var remaining = [];
 
-  var _iterator16 = _createForOfIteratorHelper(objects),
-      _step16;
+  var _iterator21 = _createForOfIteratorHelper(objects),
+      _step21;
 
   try {
-    for (_iterator16.s(); !(_step16 = _iterator16.n()).done;) {
-      var _object = _step16.value;
+    for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
+      var _object = _step21.value;
       var _slot = slots[_object.nameCC];
 
       if (_slot.object === _object) {
@@ -2403,9 +2542,9 @@ function filterObjects(objects, flags) {
       }
     }
   } catch (err) {
-    _iterator16.e(err);
+    _iterator21.e(err);
   } finally {
-    _iterator16.f();
+    _iterator21.f();
   }
 
   return remaining;
@@ -2414,34 +2553,34 @@ function filterObjects(objects, flags) {
 function calculateMatch(objFlags, flags) {
   var overallScore = 0;
 
-  var _iterator17 = _createForOfIteratorHelper(flags),
-      _step17;
+  var _iterator22 = _createForOfIteratorHelper(flags),
+      _step22;
 
   try {
-    for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
-      var flag = _step17.value;
+    for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
+      var flag = _step22.value;
       var flagScore = 0;
 
-      var _iterator18 = _createForOfIteratorHelper(objFlags),
-          _step18;
+      var _iterator23 = _createForOfIteratorHelper(objFlags),
+          _step23;
 
       try {
-        for (_iterator18.s(); !(_step18 = _iterator18.n()).done;) {
-          var objFlag = _step18.value;
+        for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
+          var objFlag = _step23.value;
           var score = 0;
 
           if (objFlag === flag) {
             score = 1;
           } else if (flagScore === 0) {
-            var _parseLocale = parseLocale(objFlag),
-                _parseLocale2 = _slicedToArray(_parseLocale, 2),
-                objLang = _parseLocale2[0],
-                objCountry = _parseLocale2[1];
-
-            var _parseLocale3 = parseLocale(flag),
+            var _parseLocale3 = parseLocale(objFlag),
                 _parseLocale4 = _slicedToArray(_parseLocale3, 2),
-                lang = _parseLocale4[0],
-                country = _parseLocale4[1];
+                objLang = _parseLocale4[0],
+                objCountry = _parseLocale4[1];
+
+            var _parseLocale5 = parseLocale(flag),
+                _parseLocale6 = _slicedToArray(_parseLocale5, 2),
+                lang = _parseLocale6[0],
+                country = _parseLocale6[1];
 
             if (lang && objLang === lang) {
               // score is lower on conflict
@@ -2456,17 +2595,17 @@ function calculateMatch(objFlags, flags) {
           }
         }
       } catch (err) {
-        _iterator18.e(err);
+        _iterator23.e(err);
       } finally {
-        _iterator18.f();
+        _iterator23.f();
       }
 
       overallScore += flagScore;
     }
   } catch (err) {
-    _iterator17.e(err);
+    _iterator22.e(err);
   } finally {
-    _iterator17.f();
+    _iterator22.f();
   }
 
   return overallScore;
@@ -2596,20 +2735,24 @@ var DataSource = /*#__PURE__*/function (_EventEmitter) {
       return fetchJSON;
     }()
   }, {
-    key: "start",
-    value: function start() {
-      this.stopped = false;
-      this.scheduleNextUpdate();
+    key: "activate",
+    value: function activate() {
+      if (this.stopped) {
+        this.stopped = false;
+        this.scheduleNextUpdate();
+      }
     }
   }, {
-    key: "stop",
-    value: function stop() {
-      this.stopped = true;
+    key: "deactivate",
+    value: function deactivate() {
+      if (!this.stopped) {
+        this.stopped = true;
 
-      if (this.updateTimeout) {
-        clearTimeout(this.updateTimeout);
-        this.updateTime = null;
-        this.updateTimeout = 0;
+        if (this.updateTimeout) {
+          clearTimeout(this.updateTimeout);
+          this.updateTime = null;
+          this.updateTimeout = 0;
+        }
       }
     }
   }, {

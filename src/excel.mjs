@@ -10,6 +10,7 @@ class Workbook {
   #status;
   #sheets = [];
   #location;
+  #locales;
 
   get title() { return this.#title }
   get keywords() { return this.#keywords }
@@ -19,6 +20,19 @@ class Workbook {
   get status() { return this.#status }
   get sheets() { return this.#sheets }
   get location() { return this.#location }
+  get locales() {
+    if (!this.#locales) {
+      this.#locales = [];
+      for (let sheet of this.#sheets) {
+        for (let locale of sheet.locales) {
+          if (!this.#locales.includes(locale)) {
+            this.#locales.push(locale);
+          }
+        }
+      }
+    }
+    return this.#locales;
+  }
 
   constructor(json, location) {
     const {
@@ -79,6 +93,7 @@ class Sheet {
   #index;
   #rows = [];
   #columns = [];
+  #locales;
 
   get workbook() { return this.#workbook }
   get name() { return this.#name }
@@ -94,6 +109,19 @@ class Sheet {
   get number() { return this.#index + 1 }
   get rows() { return this.#rows }
   get columns() { return this.#columns }
+  get locales() {
+    if (!this.#locales) {
+      this.#locales = [];
+      for (let column of this.#columns) {
+        for (let locale of column.locales) {
+          if (!this.#locales.includes(locale)) {
+            this.#locales.push(locale);
+          }
+        }
+      }
+    }
+    return this.#locales;
+  }
 
   constructor(workbook, json, index) {
     const {
@@ -224,6 +252,7 @@ class Column {
   #index;
   #headers = [];
   #cells = [];
+  #locales;
 
   get sheet() { return this.#sheet }
   get name() { return this.#name }
@@ -239,6 +268,20 @@ class Column {
   get index() { return this.#index }
   get number() { return this.#index + 1 }
   get cells() { return this.#cells }
+  get locales() {
+    if (!this.#locales) {
+      this.#locales = [];
+      for (let flag of this.#flags) {
+        const [ language, country ] = parseLocale(flag);
+        if (language || country) {
+          if (!this.#locales.includes(flag)) {
+            this.#locales.push(flag);
+          }
+        }
+      }
+    }
+    return this.#locales;
+  }
 
   constructor(sheet, json, index) {
     const {
@@ -291,6 +334,7 @@ class Row {
   get index() { return this.#index }
   get number() { return this.#index + 1 }
   get cells() { return this.#cells }
+  get locales() { return this.#sheet.locales }
 
   constructor(sheet, index) {
     this.#sheet = sheet;
@@ -358,6 +402,7 @@ class Cell {
   get name() { return this.column.name }
   get nameCC() { return this.column.nameCC }
   get nameKC() { return this.column.nameKC }
+  get locales() { return this.column.locales }
   get master() { this.#copy(); return this.#master }
 
   constructor(sheet, json, colIndex, rowIndex) {

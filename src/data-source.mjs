@@ -26,17 +26,21 @@ class DataSource extends EventEmitter {
     return this.fetch(Object, name);
   }
 
-  start() {
-    this.stopped = false;
-    this.scheduleNextUpdate();
+  activate() {
+    if (this.stopped) {
+      this.stopped = false;
+      this.scheduleNextUpdate();
+    }
   }
 
-  stop() {
-    this.stopped = true;
-    if (this.updateTimeout) {
-      clearTimeout(this.updateTimeout);
-      this.updateTime = null;
-      this.updateTimeout = 0;
+  deactivate() {
+    if (!this.stopped) {
+      this.stopped = true;
+      if (this.updateTimeout) {
+        clearTimeout(this.updateTimeout);
+        this.updateTime = null;
+        this.updateTimeout = 0;
+      }
     }
   }
 
