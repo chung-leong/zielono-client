@@ -3147,10 +3147,70 @@ var DataSourceError = /*#__PURE__*/function (_Error) {
   return DataSourceError;
 }( /*#__PURE__*/_wrapNativeSuper(Error));
 
+var DataSourceProxy = /*#__PURE__*/function () {
+  function DataSourceProxy(dataSource) {
+    _classCallCheck(this, DataSourceProxy);
+
+    this.dataSource = dataSource;
+  }
+
+  _createClass(DataSourceProxy, [{
+    key: "fetchWorkbook",
+    value: function () {
+      var _fetchWorkbook2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(name) {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                return _context6.abrupt("return", this.dataSource.fetchWorkbook(name));
+
+              case 1:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function fetchWorkbook(_x6) {
+        return _fetchWorkbook2.apply(this, arguments);
+      }
+
+      return fetchWorkbook;
+    }()
+  }, {
+    key: "fetchJSON",
+    value: function () {
+      var _fetchJSON2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(name) {
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                return _context7.abrupt("return", this.dataSource.fetchJSON(name));
+
+              case 1:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function fetchJSON(_x7) {
+        return _fetchJSON2.apply(this, arguments);
+      }
+
+      return fetchJSON;
+    }()
+  }]);
+
+  return DataSourceProxy;
+}();
+
 setDOMHandler({
   element: ReactElement,
   container: Fragment,
   create: createElement$1
 });
 
-export { Cell, Column, DataSource, DataSourceError, DataSourceEvent, Image, Row, Sheet, SheetView, Workbook, WorkbookView };
+export { Cell, Column, DataSource, DataSourceError, DataSourceEvent, DataSourceProxy, Image, Row, Sheet, SheetView, Workbook, WorkbookView };

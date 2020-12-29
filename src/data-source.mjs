@@ -204,8 +204,23 @@ class DataSourceError extends Error {
   }
 }
 
+class DataSourceProxy {
+  constructor(dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  async fetchWorkbook(name) {
+    return this.dataSource.fetchWorkbook(name);
+  }
+
+  async fetchJSON(name) {
+    return this.dataSource.fetchJSON(name);
+  }
+}
+
 export {
   DataSource,
   DataSourceEvent,
   DataSourceError,
+  DataSourceProxy,
 };

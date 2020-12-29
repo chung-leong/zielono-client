@@ -3151,6 +3151,66 @@
     return DataSourceError;
   }( /*#__PURE__*/_wrapNativeSuper(Error));
 
+  var DataSourceProxy = /*#__PURE__*/function () {
+    function DataSourceProxy(dataSource) {
+      _classCallCheck(this, DataSourceProxy);
+
+      this.dataSource = dataSource;
+    }
+
+    _createClass(DataSourceProxy, [{
+      key: "fetchWorkbook",
+      value: function () {
+        var _fetchWorkbook2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(name) {
+          return regeneratorRuntime.wrap(function _callee6$(_context6) {
+            while (1) {
+              switch (_context6.prev = _context6.next) {
+                case 0:
+                  return _context6.abrupt("return", this.dataSource.fetchWorkbook(name));
+
+                case 1:
+                case "end":
+                  return _context6.stop();
+              }
+            }
+          }, _callee6, this);
+        }));
+
+        function fetchWorkbook(_x6) {
+          return _fetchWorkbook2.apply(this, arguments);
+        }
+
+        return fetchWorkbook;
+      }()
+    }, {
+      key: "fetchJSON",
+      value: function () {
+        var _fetchJSON2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(name) {
+          return regeneratorRuntime.wrap(function _callee7$(_context7) {
+            while (1) {
+              switch (_context7.prev = _context7.next) {
+                case 0:
+                  return _context7.abrupt("return", this.dataSource.fetchJSON(name));
+
+                case 1:
+                case "end":
+                  return _context7.stop();
+              }
+            }
+          }, _callee7, this);
+        }));
+
+        function fetchJSON(_x7) {
+          return _fetchJSON2.apply(this, arguments);
+        }
+
+        return fetchJSON;
+      }()
+    }]);
+
+    return DataSourceProxy;
+  }();
+
   setDOMHandler({
     element: react.ReactElement,
     container: react.Fragment,
@@ -3162,6 +3222,7 @@
   exports.DataSource = DataSource;
   exports.DataSourceError = DataSourceError;
   exports.DataSourceEvent = DataSourceEvent;
+  exports.DataSourceProxy = DataSourceProxy;
   exports.Image = Image;
   exports.Row = Row;
   exports.Sheet = Sheet;
