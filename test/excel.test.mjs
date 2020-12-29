@@ -168,19 +168,23 @@ describe('Excel objects', function() {
       nameCC: 'sheet1',
       columns: [
         {
-          name: 'Name',
-          nameCC: 'name',
+          name: 'First name',
+          nameCC: 'firstName',
           flags: [ 'en-US' ],
-          headers: [ { value: 'Name' } ],
+          headers: [
+            { value: 'First name (en-US)' }
+          ],
           cells: [
             { value: 'Agnes' }
           ]
         },
         {
-          name: 'Name',
-          nameCC: 'name',
+          name: 'First name',
+          nameCC: 'firstName',
           flags: [ 'pl-PL' ],
-          headers: [ { value: 'Name' } ],
+          headers: [
+            { value: 'First name (pl-PL)' }
+          ],
           cells: [
             { value: 'Agnieszka' }
           ]
@@ -195,11 +199,11 @@ describe('Excel objects', function() {
       expect(sheet.flags).to.eql([]);
       expect(sheet.number).to.equal(2);
       expect(sheet.columns).to.be.an('array').with.lengthOf(2);
-      expect(sheet.columns.name).to.be.instanceOf(Column);
-      expect(sheet.columns.name.flags).to.eql([ 'en-US' ]);
+      expect(sheet.columns.firstName).to.be.instanceOf(Column);
+      expect(sheet.columns.firstName.flags).to.eql([ 'en-US' ]);
       expect(sheet.rows).to.be.an('array').with.lengthOf(1);
     })
-    describe('filter', function() {
+    describe('filter()', function() {
       it('should filter out other columns when there is exact match', function() {
         const sheet = new Sheet(workbook, json, 1);
         const view = sheet.filter([ 'pl-PL' ]);
@@ -208,19 +212,36 @@ describe('Excel objects', function() {
         expect(view.nameCC).to.equal(sheet.nameCC);
         expect(view.number).to.equal(sheet.number);
         expect(view.columns).to.be.an('array').with.lengthOf(1);
-        expect(view.columns.name.flags).to.eql([ 'pl-PL' ]);
+        expect(view.columns.firstName.flags).to.eql([ 'pl-PL' ]);
       })
       it('should filter out other columns when language matches', function() {
         const sheet = new Sheet(workbook, json, 1);
         const view = sheet.filter([ 'pl' ]);
         expect(view.columns).to.be.an('array').with.lengthOf(1);
-        expect(view.columns.name.flags).to.eql([ 'pl-PL' ]);
+        expect(view.columns.firstName.flags).to.eql([ 'pl-PL' ]);
       })
       it('should filter out other columns when country matches', function() {
         const sheet = new Sheet(workbook, json, 1);
         const view = sheet.filter([ 'PL' ]);
         expect(view.columns).to.be.an('array').with.lengthOf(1);
-        expect(view.columns.name.flags).to.eql([ 'pl-PL' ]);
+        expect(view.columns.firstName.flags).to.eql([ 'pl-PL' ]);
+      })
+    })
+    describe('column()', function() {
+      it('should find column by number', function() {
+        const sheet = new Sheet(workbook, json, 1);
+        const column = sheet.column(1);
+        expect(column).to.be.instanceOf(Column);
+      })
+      it('should find column by camelCase name', function() {
+        const sheet = new Sheet(workbook, json, 1);
+        const column = sheet.column('firstName');
+        expect(column).to.be.instanceOf(Column);
+      })
+      it('should find column by kebab-case name', function() {
+        const sheet = new Sheet(workbook, json, 1);
+        const column = sheet.column('first-name');
+        expect(column).to.be.instanceOf(Column);
       })
     })
   })
@@ -287,7 +308,7 @@ describe('Excel objects', function() {
       expect(workbook.sheets.name).to.be.an.instanceOf(Sheet);
       expect(workbook.locales).to.eql([ 'en-US', 'pl-PL' ]);
     })
-    describe('filter', function() {
+    describe('filter()', function() {
       it('should filter out sheets and columns', function() {
         const workbook = new Workbook(json);
         const view1 = workbook.filter([ 'first', 'pl-PL' ]);
@@ -302,6 +323,13 @@ describe('Excel objects', function() {
         expect(view1.sheets.name.columns.name.flags).to.eql([ 'pl-PL' ]);
         const view2 = workbook.filter([ 'last', 'pl-PL' ]);
         expect(view2.sheets.name.flags).to.eql([ 'last' ]);
+      })
+    })
+    describe('sheet()', function() {
+      it('should find sheet by camelCase name', function() {
+        const workbook = new Workbook(json);
+        const sheet = workbook.sheet('name');
+        expect(sheet).to.be.instanceOf(Sheet);
       })
     })
   })

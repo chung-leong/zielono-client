@@ -601,9 +601,9 @@ function kebabCase(nameCC) {
 }
 
 function findByName(objects, name) {
-  for (let [ index, object ] of objects) {
+  for (let [ index, object ] of objects.entries()) {
     if (index === name || object.nameCC === name || object.nameKC === name) {
-      return sheet;
+      return object;
     }
   }
 }

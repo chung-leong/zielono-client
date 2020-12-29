@@ -1196,9 +1196,9 @@
 
           try {
             for (_iterator.s(); !(_step = _iterator.n()).done;) {
-              var _sheet = _step.value;
+              var sheet = _step.value;
 
-              var _iterator2 = _createForOfIteratorHelper(_sheet.locales),
+              var _iterator2 = _createForOfIteratorHelper(sheet.locales),
                   _step2;
 
               try {
@@ -1294,9 +1294,9 @@
         for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
           var _step3$value = _slicedToArray(_step3.value, 2),
               index = _step3$value[0],
-              _sheet2 = _step3$value[1];
+              sheet = _step3$value[1];
 
-          _classPrivateFieldLooseBase(this, _sheets)[_sheets].push(new Sheet(this, _sheet2, index));
+          _classPrivateFieldLooseBase(this, _sheets)[_sheets].push(new Sheet(this, sheet, index));
         }
       } catch (err) {
         _iterator3.e(err);
@@ -1383,9 +1383,9 @@
 
       try {
         for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-          var _sheet3 = _step4.value;
+          var sheet = _step4.value;
 
-          _classPrivateFieldLooseBase(this, _sheets2)[_sheets2].push(_sheet3.filter(flags));
+          _classPrivateFieldLooseBase(this, _sheets2)[_sheets2].push(sheet.filter(flags));
         }
       } catch (err) {
         _iterator4.e(err);
@@ -1750,7 +1750,7 @@
     return Sheet;
   }();
 
-  var _sheet4 = _classPrivateFieldLooseKey("sheet");
+  var _sheet = _classPrivateFieldLooseKey("sheet");
 
   var _columns2 = _classPrivateFieldLooseKey("columns");
 
@@ -1760,37 +1760,37 @@
     _createClass(SheetView, [{
       key: "workbook",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].workbook;
+        return _classPrivateFieldLooseBase(this, _sheet)[_sheet].workbook;
       }
     }, {
       key: "name",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].name;
+        return _classPrivateFieldLooseBase(this, _sheet)[_sheet].name;
       }
     }, {
       key: "nameCC",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].nameCC;
+        return _classPrivateFieldLooseBase(this, _sheet)[_sheet].nameCC;
       }
     }, {
       key: "nameKC",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].nameKC;
+        return _classPrivateFieldLooseBase(this, _sheet)[_sheet].nameKC;
       }
     }, {
       key: "flags",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].flags;
+        return _classPrivateFieldLooseBase(this, _sheet)[_sheet].flags;
       }
     }, {
       key: "index",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].index;
+        return _classPrivateFieldLooseBase(this, _sheet)[_sheet].index;
       }
     }, {
       key: "number",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].number;
+        return _classPrivateFieldLooseBase(this, _sheet)[_sheet].number;
       }
     }, {
       key: "rows",
@@ -1807,7 +1807,7 @@
     function SheetView(sheet, flags) {
       _classCallCheck(this, SheetView);
 
-      Object.defineProperty(this, _sheet4, {
+      Object.defineProperty(this, _sheet, {
         writable: true,
         value: void 0
       });
@@ -1819,7 +1819,7 @@
         writable: true,
         value: []
       });
-      _classPrivateFieldLooseBase(this, _sheet4)[_sheet4] = sheet;
+      _classPrivateFieldLooseBase(this, _sheet)[_sheet] = sheet;
       var columns = sheet.columns,
           rows = sheet.rows;
 
@@ -1861,7 +1861,7 @@
     return SheetView;
   }();
 
-  var _sheet5 = _classPrivateFieldLooseKey("sheet");
+  var _sheet2 = _classPrivateFieldLooseKey("sheet");
 
   var _name2 = _classPrivateFieldLooseKey("name");
 
@@ -1883,7 +1883,7 @@
     _createClass(Column, [{
       key: "sheet",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet5)[_sheet5];
+        return _classPrivateFieldLooseBase(this, _sheet2)[_sheet2];
       }
     }, {
       key: "name",
@@ -1967,7 +1967,7 @@
     function Column(sheet, json, index) {
       _classCallCheck(this, Column);
 
-      Object.defineProperty(this, _sheet5, {
+      Object.defineProperty(this, _sheet2, {
         writable: true,
         value: void 0
       });
@@ -2013,7 +2013,7 @@
           headers = _json$headers === void 0 ? [] : _json$headers,
           _json$cells = json.cells,
           cells = _json$cells === void 0 ? [] : _json$cells;
-      _classPrivateFieldLooseBase(this, _sheet5)[_sheet5] = sheet;
+      _classPrivateFieldLooseBase(this, _sheet2)[_sheet2] = sheet;
       _classPrivateFieldLooseBase(this, _name2)[_name2] = name;
       _classPrivateFieldLooseBase(this, _nameCC2)[_nameCC2] = nameCC;
       _classPrivateFieldLooseBase(this, _flags2)[_flags2] = flags;
@@ -2115,7 +2115,7 @@
     return Column;
   }();
 
-  var _sheet6 = _classPrivateFieldLooseKey("sheet");
+  var _sheet3 = _classPrivateFieldLooseKey("sheet");
 
   var _index4 = _classPrivateFieldLooseKey("index");
 
@@ -2125,7 +2125,7 @@
     _createClass(Row, [{
       key: "sheet",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet6)[_sheet6];
+        return _classPrivateFieldLooseBase(this, _sheet3)[_sheet3];
       }
     }, {
       key: "index",
@@ -2145,14 +2145,14 @@
     }, {
       key: "locales",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet6)[_sheet6].locales;
+        return _classPrivateFieldLooseBase(this, _sheet3)[_sheet3].locales;
       }
     }]);
 
     function Row(sheet, index) {
       _classCallCheck(this, Row);
 
-      Object.defineProperty(this, _sheet6, {
+      Object.defineProperty(this, _sheet3, {
         writable: true,
         value: void 0
       });
@@ -2164,7 +2164,7 @@
         writable: true,
         value: []
       });
-      _classPrivateFieldLooseBase(this, _sheet6)[_sheet6] = sheet;
+      _classPrivateFieldLooseBase(this, _sheet3)[_sheet3] = sheet;
       _classPrivateFieldLooseBase(this, _index4)[_index4] = index;
       var columns = sheet.columns;
 
@@ -2238,7 +2238,7 @@
     return Row;
   }();
 
-  var _sheet7 = _classPrivateFieldLooseKey("sheet");
+  var _sheet4 = _classPrivateFieldLooseKey("sheet");
 
   var _value = _classPrivateFieldLooseKey("value");
 
@@ -2264,7 +2264,7 @@
     _createClass(Cell, [{
       key: "sheet",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet7)[_sheet7];
+        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4];
       }
     }, {
       key: "value",
@@ -2319,7 +2319,7 @@
     }, {
       key: "column",
       get: function get() {
-        return _classPrivateFieldLooseBase(this, _sheet7)[_sheet7].columns[_classPrivateFieldLooseBase(this, _colIndex)[_colIndex]];
+        return _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].columns[_classPrivateFieldLooseBase(this, _colIndex)[_colIndex]];
       }
     }, {
       key: "columnIndex",
@@ -2366,7 +2366,7 @@
       Object.defineProperty(this, _copy, {
         value: _copy2
       });
-      Object.defineProperty(this, _sheet7, {
+      Object.defineProperty(this, _sheet4, {
         writable: true,
         value: void 0
       });
@@ -2406,7 +2406,7 @@
         writable: true,
         value: void 0
       });
-      _classPrivateFieldLooseBase(this, _sheet7)[_sheet7] = sheet;
+      _classPrivateFieldLooseBase(this, _sheet4)[_sheet4] = sheet;
       _classPrivateFieldLooseBase(this, _colIndex)[_colIndex] = colIndex;
       _classPrivateFieldLooseBase(this, _rowIndex2)[_rowIndex2] = rowIndex;
 
@@ -2495,7 +2495,7 @@
           col = _classPrivateFieldLoo.col,
           row = _classPrivateFieldLoo.row;
 
-      var cell = _classPrivateFieldLooseBase(this, _sheet7)[_sheet7].cell(col, row);
+      var cell = _classPrivateFieldLooseBase(this, _sheet4)[_sheet4].cell(col, row);
 
       if (cell) {
         _classPrivateFieldLooseBase(this, _value)[_value] = cell.value;
@@ -2686,7 +2686,7 @@
   }
 
   function findByName(objects, name) {
-    var _iterator24 = _createForOfIteratorHelper(objects),
+    var _iterator24 = _createForOfIteratorHelper(objects.entries()),
         _step24;
 
     try {
@@ -2696,7 +2696,7 @@
             object = _step24$value[1];
 
         if (index === name || object.nameCC === name || object.nameKC === name) {
-          return sheet;
+          return object;
         }
       }
     } catch (err) {

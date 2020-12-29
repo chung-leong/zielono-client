@@ -62,17 +62,13 @@ describe('Data source', function() {
       ds = new DataSource({
         baseURL: 'http://localhost/site-1/',
       });
-      try {
-        put({
-          headers: { etag: 'abcdef' },
-          json: { hello: 'world' }
-        });
-        const result = await ds.fetchJSON('goat');
-        expect(result).to.eql({ hello: 'world' });
-        expect(lastRequest).to.have.property('url', 'http://localhost/site-1/-/data/goat')
-      } finally {
-        ds.stop();
-      }
+      put({
+        headers: { etag: 'abcdef' },
+        json: { hello: 'world' }
+      });
+      const result = await ds.fetchJSON('goat');
+      expect(result).to.eql({ hello: 'world' });
+      expect(lastRequest).to.have.property('url', 'http://localhost/site-1/-/data/goat')
     })
     it('should return the same object when called a second time', async function() {
       ds = new DataSource({
