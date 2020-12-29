@@ -16,16 +16,15 @@ const server = {
     })();
     // attach static file handler
     app.get('/:path(*.*)', async (req, res, next) => {
+      const { path } = req.params;
       try {
         await waitUntilValid();
-        const { path } = req.params;
         const ext = extname(path);
-        const filename = basename(path);
-        const filePath = `${contentBase}/www/${filename}`;
+        const filePath = `${contentBase}/www/${path}`;
         const buffer = fs.readFileSync(filePath);
         res.type(ext).send(buffer);
       } catch (err) {
-        if (filename === 'favicon.ico') {
+        if (path === 'favicon.ico') {
           res.sendStatus(204);
           return;
         }

@@ -57,6 +57,10 @@ class Workbook {
     attachProperties(this.#sheets);
   }
 
+  sheet(name) {
+    return findByName(this.sheets, name);
+  }
+
   filter(flags) {
     return new WorkbookView(this, flags);
   }
@@ -81,6 +85,10 @@ class WorkbookView {
       this.#sheets.push(sheet.filter(flags));
     }
     attachProperties(this.#sheets);
+  }
+
+  sheet(name) {
+    return findByName(this.sheets, name);
   }
 }
 
@@ -145,6 +153,10 @@ class Sheet {
       this.#rows.push(new Row(this, i));
     }
     attachProperties(this.#columns);
+  }
+
+  column(name) {
+    return findByName(this.columns, name);
   }
 
   cell(colIndex, rowIndex) {
@@ -235,6 +247,10 @@ class SheetView {
       this.#rows.push(new Row(this, i));
     }
     attachProperties(this.#columns);
+  }
+
+  column(name) {
+    return findByName(this.columns, name);
   }
 
   render(props) {
@@ -344,6 +360,10 @@ class Row {
       this.#cells.push(column.cells[this.#index]);
     }
     attachProperties(this.#cells);
+  }
+
+  cell(name) {
+    return findByName(this.cells, name);
   }
 
   get(types) {
@@ -578,6 +598,14 @@ function stringifyValue(value) {
 
 function kebabCase(nameCC) {
   return nameCC.replace(/[A-Z]/g, (m0) => '-' + m0.toLowerCase());
+}
+
+function findByName(objects, name) {
+  for (let [ index, object ] of objects) {
+    if (index === name || object.nameCC === name || object.nameKC === name) {
+      return sheet;
+    }
+  }
 }
 
 export {
