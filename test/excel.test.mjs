@@ -375,15 +375,15 @@ describe('Excel objects', function() {
   })
   describe('Column', function() {
     const sheet = {};
-    const json = {
-      name: 'First name',
-      nameCC: 'firstName',
-      headers: [ { value: 'First name' } ],
-      cells: [
-        { value: 'Agnieszka' },
-      ]
-    };
     it('should process JSON data correctly', function() {
+      const json = {
+        name: 'First name',
+        nameCC: 'firstName',
+        headers: [ { value: 'First name' } ],
+        cells: [
+          { value: 'Agnieszka' },
+        ]
+      };
       const column = new Column(sheet, json, 1);
       expect(column.sheet).to.equal(sheet)
       expect(column.name).to.equal('First name');
@@ -395,6 +395,45 @@ describe('Excel objects', function() {
       expect(column.cells).to.be.an('array').with.lengthOf(1);
       expect(column.cells[0]).to.be.instanceOf(Cell);
       expect(column.number).to.equal(2);
+    })
+    describe('render()', function() {
+      it('should render a ul element by default', function() {
+        const json = {
+          name: 'First name',
+          nameCC: 'firstName',
+          headers: [ { value: 'First name' } ],
+          cells: [
+            { value: 'Agnieszka' },
+            { value: 'Basia' },
+          ]
+        };
+        const column = new Column(sheet, json, 1);
+        const result = column.render();
+        expect(result).to.eql({
+          tag: 'ul',
+          props: {},
+          children: [
+            {
+              tag: 'li',
+              props: { key: 0, style: {} },
+              children: {
+                tag: TestContainer,
+                props: {},
+                children: [ 'Agnieszka' ]
+              }
+            },
+            {
+              tag: 'li',
+              props: { key: 1, style: {} },
+              children: {
+                tag: TestContainer,
+                props: {},
+                children: [ 'Basia' ]
+              }
+            },
+          ]
+        })
+      })
     })
   })
   describe('Sheet', function() {
