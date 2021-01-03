@@ -110,7 +110,12 @@ class Image {
   }
 
   render(props) {
-    const { tagName = 'picture', width, height, ...others } = props;
+    const {
+      tagName = 'picture',
+      width,
+      height,
+      ...others
+    } = props || {};
     const dimSets = this.getDimensionSets(width, height);
     if (tagName === 'picture') {
       return this.renderPictureTag(dimSets, others);
@@ -149,7 +154,8 @@ class Image {
     const src = this.getURL(width, height, this.format);
     const imgProps = { key: children.length, width, height, src, ...others };
     children.push(createElement('img', imgProps));
-    return createElement('picture', { key }, children);
+    const pictureProps = (key !== undefined) ? { key } : {};
+    return createElement('picture', pictureProps, children);
   }
 }
 

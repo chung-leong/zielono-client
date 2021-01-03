@@ -1,4 +1,6 @@
 import Chai from 'chai'; const { expect } = Chai;
+import { setDOMHandler } from '../src/dom.mjs';
+import { Image } from '../src/image.mjs';
 
 import {
   Cell,
@@ -6,9 +8,6 @@ import {
   Sheet,
   Workbook,
 } from '../src/excel.mjs';
-import {
-  setDOMHandler
-} from '../src/dom.mjs';
 
 class TestElement {}
 class TestContainer {}
@@ -28,7 +27,10 @@ describe('Excel objects', function() {
   })
   describe('Cell', function() {
     const sheet = {
-      columns: [ { name: 'Greeting', nameCC: 'greeting' } ]
+      columns: [ { name: 'Greeting', nameCC: 'greeting' } ],
+      workbook: {
+        location: { baseURL: '/site1' }
+      }
     };
     it('should handle plain text value correctly', function() {
       const cell = new Cell(sheet, { value: 'Hello' }, 0, 0);
@@ -135,7 +137,241 @@ describe('Excel objects', function() {
         ],
       })
     })
-
+    it('should transfer cell-level text style to rich text value', function() {
+      const richText = [
+        {
+          text: 'This is a '
+        },
+        {
+          text: 'test',
+          style: { fontWeight: 'bold' }
+        },
+        {
+          text: '!'
+        },
+      ];
+      const cell = new Cell(sheet, {
+        value: richText,
+        style: {
+          color: '#ff0000'
+        },
+      }, 0, 0);
+      expect(cell.richText).to.eql({
+        tag: TestContainer,
+        props: {},
+        children: [
+          {
+            tag: 'span',
+            props: { key: 0, style: { color: '#ff0000' } },
+            children: 'This is a ',
+          },
+          {
+            tag: 'span',
+            props: { key: 1, style: { color: '#ff0000', fontWeight: 'bold' } },
+            children: 'test'
+          },
+          {
+            tag: 'span',
+            props: { key: 2, style: { color: '#ff0000' } },
+            children: '!',
+          },
+        ]
+      })
+    })
+    it('should process image info', function() {
+      const cell = new Cell(sheet, {
+        value: 'Hello',
+        image: {
+          hash: 'ABCD',
+          width: 300,
+          height: 200,
+          format: 'jpeg'
+        },
+        style: {
+          color: '#ff0000',
+          verticalAlign: 'top',
+        },
+      }, 0, 0);
+      expect(cell.image).to.be.instanceOf(Image);
+    })
+    describe('render()', function() {
+      it('should render a div element by default', function() {
+        const cell = new Cell(sheet, {
+          value: 'Hello',
+          style: {
+            color: '#ff0000',
+            verticalAlign: 'top',
+          },
+        }, 0, 0);
+        const result = cell.render();
+        expect(result).to.eql({
+          tag: 'div',
+          props: { style: { color: '#ff0000', verticalAlign: 'top' } },
+          children: {
+            tag: TestContainer,
+            props: {},
+            children: [ 'Hello' ],
+          }
+        });
+      })
+      it('should use specified tag name', function() {
+        const cell = new Cell(sheet, {
+          value: 'Hello',
+          style: {
+            color: '#ff0000',
+            verticalAlign: 'top',
+          },
+        }, 0, 0);
+        const result = cell.render({ tagName: 'td' });
+        expect(result).to.eql({
+          tag: 'td',
+          props: { style: { color: '#ff0000', verticalAlign: 'top' } },
+          children: {
+            tag: TestContainer,
+            props: {},
+            children: [ 'Hello' ],
+          }
+        });
+      })
+      it('should render image tag only when there is no text', function() {
+        const cell = new Cell(sheet, {
+          value: null,
+          image: {
+            hash: 'ABCD',
+            width: 300,
+            height: 200,
+            format: 'jpeg'
+          },
+          style: {
+            color: '#ff0000',
+            verticalAlign: 'top',
+          },
+        }, 0, 0);
+        const result = cell.render();
+        expect(result).to.eql({
+          tag: 'div',
+          props: { style: { color: '#ff0000', verticalAlign: 'top' } },
+          children: {
+            tag: 'picture',
+            props: {},
+            children: [
+              {
+                tag: 'source',
+                props: { key: 0, srcset: '/site1/-/images/ABCD/re300x200.webp 300w', type: 'image/webp' },
+                children: undefined,
+              },
+              {
+                tag: 'source',
+                props: { key: 1, srcset: '/site1/-/images/ABCD/re300x200.jpeg 300w', type: 'image/jpeg' },
+                children: undefined,
+              },
+              {
+                tag: 'img',
+                props: { key: 2, src: '/site1/-/images/ABCD/re300x200.jpeg', width: 300, height: 200 },
+                children: undefined,
+              },
+            ],
+          }
+        });
+      })
+      it('should render figure tag only when there is text', function() {
+        const cell = new Cell(sheet, {
+          value: 'Hello',
+          image: {
+            hash: 'ABCD',
+            width: 300,
+            height: 200,
+            format: 'jpeg'
+          },
+          style: {
+            color: '#ff0000',
+            verticalAlign: 'top',
+          },
+        }, 0, 0);
+        const result = cell.render();
+        expect(result).to.eql({
+          tag: 'div',
+          props: { style: { color: '#ff0000', verticalAlign: 'top' } },
+          children: {
+            tag: 'figure',
+            props: {},
+            children: [
+              {
+                tag: 'picture',
+                props: { key: 0 },
+                children: [
+                  {
+                    tag: 'source',
+                    props: { key: 0, srcset: '/site1/-/images/ABCD/re300x200.webp 300w', type: 'image/webp' },
+                    children: undefined,
+                  },
+                  {
+                    tag: 'source',
+                    props: { key: 1, srcset: '/site1/-/images/ABCD/re300x200.jpeg 300w', type: 'image/jpeg' },
+                    children: undefined,
+                  },
+                  {
+                    tag: 'img',
+                    props: { key: 2, src: '/site1/-/images/ABCD/re300x200.jpeg', width: 300, height: 200 },
+                    children: undefined,
+                  },
+                ],
+              },
+              {
+                tag: 'figcaption',
+                props: { key: 1 },
+                children: {
+                  tag: TestContainer,
+                  props: {},
+                  children: [ 'Hello' ],
+                }
+              }
+            ]
+          }
+        });
+      })
+      it('should render image with given settings', function() {
+        const cell = new Cell(sheet, {
+          value: null,
+          image: {
+            hash: 'ABCD',
+            width: 300,
+            height: 200,
+            format: 'jpeg'
+          },
+          style: {
+            color: '#ff0000',
+            verticalAlign: 'top',
+          },
+        }, 0, 0);
+        const result = cell.render({ image: { width: 30 } });
+        expect(result).to.eql({
+          tag: 'div',
+          props: { style: { color: '#ff0000', verticalAlign: 'top' } },
+          children: {
+            tag: 'picture',
+            props: {},
+            children: [
+              {
+                tag: 'source',
+                props: { key: 0, srcset: '/site1/-/images/ABCD/re30x20.webp 30w, /site1/-/images/ABCD/re45x30.webp 45w, /site1/-/images/ABCD/re60x40.webp 60w, /site1/-/images/ABCD/re75x50.webp 75w, /site1/-/images/ABCD/re90x60.webp 90w, /site1/-/images/ABCD/re105x70.webp 105w, /site1/-/images/ABCD/re120x80.webp 120w', type: 'image/webp' },
+                children: undefined,
+              },
+              {
+                tag: 'source',
+                props: { key: 1, srcset: '/site1/-/images/ABCD/re30x20.jpeg 30w, /site1/-/images/ABCD/re45x30.jpeg 45w, /site1/-/images/ABCD/re60x40.jpeg 60w, /site1/-/images/ABCD/re75x50.jpeg 75w, /site1/-/images/ABCD/re90x60.jpeg 90w, /site1/-/images/ABCD/re105x70.jpeg 105w, /site1/-/images/ABCD/re120x80.jpeg 120w', type: 'image/jpeg' },
+                children: undefined,
+              },
+              {
+                tag: 'img',
+                props: { key: 2, src: '/site1/-/images/ABCD/re30x20.jpeg', width: 30, height: 20 },
+                children: undefined,
+              },
+            ],
+          }
+        });
+      })
+    })
   })
   describe('Column', function() {
     const sheet = {};
