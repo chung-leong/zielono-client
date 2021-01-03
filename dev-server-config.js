@@ -207,4 +207,62 @@ function getPreferredLanguage(req) {
   return list[0].code;
 }
 
+const cache = [];
+
+function fetchWithCaching(url, options) {
+  const cacheable = () => {
+    if (options) {
+      const { method = 'GET', headers = {} } = options;
+      if (method.toUpperCase() !== 'GET') {
+        return false;
+      }
+      const names = Object.keys(headers).map((k) => k.toLowerCase());
+      if (names.includes('if-none-match') || names.includes('if-modified-since')) {
+        return false;
+      }
+    }
+    return true;
+  };
+  if (!cacheable()) {
+    return fetch(url, options);
+  }
+  let entry = cache.find((e) => e.url === url);
+  if (entry) {
+    const etag = entry.headers['etag'];
+    const mtime = entry.headers['last-modified'];
+    options = { ...options };
+    options.headers = { ...options.headers };
+    if (etag) {
+      options.headers['if-none-match'] = etag;
+    } else if (mtime) {
+      options.headers['if-modified-since'] = mtime;
+    }
+  } else {
+    entry = { url };
+    cache.push(entry);
+    if (cache.length > 100) {
+      cache.shift();
+    }
+  }
+  if (!entry.retrieval) {
+    const update = async () => {
+      try {
+        const res = await fetch(url, options);
+        if (res.statusCode !== 304) {
+          entry.status = res.status;
+          entry.statusText = res.statusText;
+          entry.headers = res.headers;
+          entry.buffer = await res.buffer();
+        }
+      } finally {
+        entry.retrieval = null;
+      }
+    };
+    entry.retrieval = update();
+  }
+  await entry.retrieval;
+  const { status, statusText, headers, buffer } = entry;
+  return new Response(buffer, { status, statusText, headers });
+}
+
 module.exports = server;
